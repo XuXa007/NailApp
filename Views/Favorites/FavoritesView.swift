@@ -1,7 +1,14 @@
-//
-//  FavoritesView.swift
-//  NailApp
-//
-//  Created by Ксюша Лягашкина on 10.05.2025.
-//
+import SwiftUI
 
+struct FavoritesView: View {
+    @EnvironmentObject var favVM: FavoritesViewModel
+
+    var body: some View {
+        List {
+            ForEach(favVM.favorites) { design in
+                DesignCardView(design: design)
+            }
+        }
+        .navigationTitle("Favorites")
+    }
+}
