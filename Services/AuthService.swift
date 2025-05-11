@@ -5,7 +5,6 @@ class AuthService {
     private init() {}
 
     func login(username: String, password: String) async throws -> UserProfile {
-        // Fake auth
         return UserProfile(id: .init(), username: username, email: "\(username)@mail.com")
     }
 

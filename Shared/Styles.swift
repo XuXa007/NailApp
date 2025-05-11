@@ -1,6 +1,6 @@
 import SwiftUI
 
-// Текстовые поля
+// поля
 struct FieldStyle: TextFieldStyle {
     func _body(configuration: TextField<Self._Label>) -> some View {
         configuration
@@ -12,7 +12,7 @@ struct FieldStyle: TextFieldStyle {
     }
 }
 
-// MARK: — Основная кнопка
+// основная кнопка
 struct PrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label

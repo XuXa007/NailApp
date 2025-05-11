@@ -3,24 +3,23 @@ import SwiftUI
 struct FilterView: View {
     @ObservedObject var vm: FilterViewModel
     @Environment(\.dismiss) private var dismiss
-
+    
     var body: some View {
         NavigationStack {
             VStack(spacing: 16) {
-                // 1. Полоса-хваталка
+                // полоса
                 Capsule()
                     .fill(Color.secondary.opacity(0.4))
                     .frame(width: 40, height: 5)
                     .padding(.top, 8)
-
+                
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
-                        // Цвета
                         filterSection(
                             title: "Цвета",
                             items: vm.availableColors,
                             isSelected: { vm.filter.selectedColors.contains($0) },
-                            colorFor: { $0.uiColor },
+                            colorFor: { $0.color },      // ← здесь
                             toggle: { color in
                                 if vm.filter.selectedColors.contains(color) {
                                     vm.filter.selectedColors.remove(color)
@@ -29,13 +28,12 @@ struct FilterView: View {
                                 }
                             }
                         )
-
-                        // Стиль
+                        
                         filterSection(
                             title: "Стиль",
                             items: vm.availableStyles,
                             isSelected: { vm.filter.selectedStyles.contains($0) },
-                            colorFor: { _ in Color.accentColor },
+                            colorFor: { _ in .accentColor },
                             toggle: { style in
                                 if vm.filter.selectedStyles.contains(style) {
                                     vm.filter.selectedStyles.remove(style)
@@ -44,13 +42,12 @@ struct FilterView: View {
                                 }
                             }
                         )
-
-                        // Сезон
+                        
                         filterSection(
                             title: "Сезон",
                             items: vm.availableSeasons,
                             isSelected: { vm.filter.selectedSeasons.contains($0) },
-                            colorFor: { _ in Color.accentColor },
+                            colorFor: { _ in .accentColor },
                             toggle: { season in
                                 if vm.filter.selectedSeasons.contains(season) {
                                     vm.filter.selectedSeasons.remove(season)
@@ -59,13 +56,12 @@ struct FilterView: View {
                                 }
                             }
                         )
-
-                        // Тип
+                        
                         filterSection(
                             title: "Тип",
                             items: vm.availableTypes,
                             isSelected: { vm.filter.selectedTypes.contains($0) },
-                            colorFor: { _ in Color.accentColor },
+                            colorFor: { _ in .accentColor },
                             toggle: { type in
                                 if vm.filter.selectedTypes.contains(type) {
                                     vm.filter.selectedTypes.remove(type)
@@ -94,8 +90,7 @@ struct FilterView: View {
             }
         }
     }
-
-    // Универсальный метод для «чипов»
+    
     @ViewBuilder
     private func filterSection<Item: Identifiable & CustomStringConvertible>(
         title: String,
@@ -108,7 +103,7 @@ struct FilterView: View {
             Text(title)
                 .font(.headline)
                 .padding(.leading, 4)
-
+            
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(items) { item in

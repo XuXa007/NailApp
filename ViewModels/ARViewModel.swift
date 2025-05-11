@@ -6,7 +6,7 @@ import UIKit
 class ARViewModel: ObservableObject {
     @Published var selectedImage: UIImage? = nil
     @Published var outputImage: UIImage? = nil
-
+    
     func apply(design: UIImage) {
         guard let input = selectedImage else { return }
         outputImage = ARImageProcessor.apply(design: design, to: input)

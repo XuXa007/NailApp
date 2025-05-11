@@ -1,23 +1,39 @@
-import Foundation
+import SwiftUI
 
 @MainActor
-class FavoritesViewModel: ObservableObject {
-    /// Список избранных дизайнов
-    @Published private(set) var favorites: [NailDesign] = []
+final class FavoritesViewModel: ObservableObject {
+    @Published private(set) var items: [NailDesign] = []
+    @Published var isLoading = false
     
-    /// Добавить/убрать дизайн из избранного
-    func toggle(_ design: NailDesign) {
-        if isFavorite(design) {
-            // убрать
-            favorites.removeAll { $0.id == design.id }
-        } else {
-            // добавить
-            favorites.append(design)
+    //  с сервера)
+    func loadFavorites() async {
+        isLoading = true
+        defer { isLoading = false }
+        do {
+            items = try await ApiService.shared.fetchFavorites()
+        } catch {
+            print("Ошибка загрузки избранного:", error)
         }
     }
     
-    /// Проверить, есть ли уже в избранном
+    // статус избранного и ресинхронизация
+    func toggle(_ design: NailDesign) {
+        Task {
+            do {
+                if items.contains(where: { $0.id == design.id }) {
+                    try await ApiService.shared.removeFavorite(id: design.id)
+                } else {
+                    try await ApiService.shared.addFavorite(id: design.id)
+                }
+                await loadFavorites()
+            } catch {
+                print("Ошибка переключения избранного:", error)
+            }
+        }
+    }
+    
+    // в избранном ли
     func isFavorite(_ design: NailDesign) -> Bool {
-        favorites.contains { $0.id == design.id }
+        items.contains(where: { $0.id == design.id })
     }
 }

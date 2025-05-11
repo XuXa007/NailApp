@@ -2,38 +2,56 @@ import SwiftUI
 
 struct DesignsView: View {
     @EnvironmentObject private var vm: DesignsViewModel
+    @EnvironmentObject private var favVM: FavoritesViewModel
     @State private var showFilter = false
-
+    
     var body: some View {
-        Group {
-            if vm.isLoading {
-                LoadingView()
-            } else {
+        ZStack {
+            LinearGradient(
+                gradient: Gradient(colors: [Color.purple.opacity(0.3), Color.blue.opacity(0.3)]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                HStack {
+                    Text("Каталог")
+                        .font(.largeTitle).bold()
+                        .foregroundColor(.white)
+                    Spacer()
+                    Button {
+                        showFilter.toggle()
+                    } label: {
+                        Label("Фильтр", systemImage: "line.horizontal.3.decrease.circle")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .padding(.vertical, 6)
+                            .padding(.horizontal, 12)
+                            .background(Color.white.opacity(0.2))
+                            .clipShape(Capsule())
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.top, 16)
+                
+                // Сетка
                 ScrollView {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 150))], spacing: 16) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 16)], spacing: 16) {
                         ForEach(vm.filteredDesigns) { design in
-                            DesignCardView(design: design)
-                                .onTapGesture {
-                                    // тут можно делать навигацию в DesignDetailView(design:)
-                                }
+                            NavigationLink {
+                                DesignDetailView(design: design)
+                                    .environmentObject(favVM)
+                            } label: {
+                                DesignCardView(design: design)
+                            }
                         }
                     }
                     .padding()
                 }
             }
         }
-        .navigationTitle("Designs")
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    showFilter.toggle()
-                } label: {
-                    Image(systemName: "slider.horizontal.3")
-                }
-            }
-        }
         .sheet(isPresented: $showFilter) {
-            // Исправлено: использую правильный способ инициализации FilterViewModel
             FilterView(
                 vm: FilterViewModel(
                     filter: vm.designFilter,
