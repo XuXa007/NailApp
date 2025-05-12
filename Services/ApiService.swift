@@ -16,7 +16,7 @@ class ApiService {
             .object(forInfoDictionaryKey: "ServerURL") as? String,
               let url = URL(string: string)
         else {
-            fatalError("ServerURL не задан в Info.plist")
+            fatalError("ServerURL не задан")
         }
         return url
     }
@@ -25,7 +25,7 @@ class ApiService {
     func fetchDesigns(using filter: DesignFilter) async throws -> [NailDesign] {
         var comps = URLComponents(url: baseURL.appendingPathComponent("api/designs"),
                                   resolvingAgainstBaseURL: false)
-        var queryItems: [URLQueryItem] = []
+        let queryItems: [URLQueryItem] = []
         comps?.queryItems = queryItems.isEmpty ? nil : queryItems
         
         guard let url = comps?.url else {

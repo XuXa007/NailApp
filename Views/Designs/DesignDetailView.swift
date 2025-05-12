@@ -53,7 +53,7 @@ struct DesignDetailView: View {
                         .buttonStyle(ActionButtonStyle(filled: false))
                         
                         NavigationLink {
-                            ARTryOnView(design: design)
+                            ARTryOnView()
                         } label: {
                             Label("Try On", systemImage: "sparkles")
                         }

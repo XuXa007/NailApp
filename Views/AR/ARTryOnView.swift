@@ -1,38 +1,78 @@
 import SwiftUI
+import Combine
 
+// Представление, в котором пользователь выбирает фото,
+// отправляет его на сервер и видит результат (маску)
 struct ARTryOnView: View {
-    let design: NailDesign
     @StateObject private var vm = ARViewModel()
+    @State private var inputImage: UIImage?
     @State private var showPicker = false
-    
+
     var body: some View {
-        VStack(spacing: 20) {
-            if let out = vm.outputImage {
-                Image(uiImage: out)
-                    .resizable()
-                    .scaledToFit()
-            } else {
-                Button("Pick Photo") {
-                    showPicker = true
+        NavigationView {
+            VStack(spacing: 20) {
+                // Отображаем результат или подсказку
+                if vm.isLoading {
+                    ProgressView("Генерируем маску…")
                 }
-            }
-            Spacer()
-        }
-        .navigationTitle("Try On")
-        .sheet(isPresented: $showPicker) {
-            ImagePickerView(image: $vm.selectedImage)
-                .onChange(of: vm.selectedImage) { oldValue, newValue in
-                    Task {
-                        // загрузить
-                        guard let url = design.imageURL,
-                              let (data, _) = try? await URLSession.shared.data(from: url),
-                              let uiDesign = UIImage(data: data) else {
-                            return
+                else if let mask = vm.maskImage {
+                    Image(uiImage: mask)
+                        .resizable()
+                        .scaledToFit()
+                        .cornerRadius(12)
+                        .shadow(radius: 4)
+                }
+                else {
+                    Text("Загрузите фото, чтобы создать маску")
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                }
+
+                // Кнопки действия
+                HStack(spacing: 16) {
+                    Button(action: { showPicker = true }) {
+                        Label("Выбрать фото", systemImage: "photo")
+                    }
+                    .buttonStyle(.borderedProminent)
+
+                    if inputImage != nil {
+                        Button(action: {
+                            vm.generateMask(from: inputImage!)
+                        }) {
+                            Label("Сгенерировать маску", systemImage: "wand.and.stars")
                         }
-                        // наложить ??
-                        vm.apply(design: uiDesign)
+                        .buttonStyle(.bordered)
                     }
                 }
+
+                // Ошибка
+                if let error = vm.errorMessage {
+                    Text(error)
+                        .foregroundColor(.red)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 8)
+                }
+
+                Spacer()
+            }
+            .padding()
+            .navigationTitle("AR Try-On")
+            .sheet(isPresented: $showPicker) {
+                ImagePickerView(image: $inputImage)
+            }
+            // Как только пользователь выбрал изображение — сразу генерируем маску
+            .onChange(of: inputImage) { oldValue, newValue in
+                if let img = newValue {
+                    vm.generateMask(from: img)
+                }
+            }
         }
+    }
+}
+
+struct ARTryOnView_Previews: PreviewProvider {
+    static var previews: some View {
+        ARTryOnView()
     }
 }

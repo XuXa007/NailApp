@@ -103,7 +103,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		C928C3492DD0106700A83A30 /* Exceptions for "NailApp" folder in "NailApp" target */ = {
+		C922115A2DD28F9400D5BA9D /* Exceptions for "NailApp" folder in "NailApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -116,7 +116,7 @@
 		C9B5FCEC2DCD4C4F0042038A /* NailApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				C928C3492DD0106700A83A30 /* Exceptions for "NailApp" folder in "NailApp" target */,
+				C922115A2DD28F9400D5BA9D /* Exceptions for "NailApp" folder in "NailApp" target */,
 			);
 			path = NailApp;
 			sourceTree = "<group>";
@@ -636,7 +636,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NailApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -667,7 +669,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = NailApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

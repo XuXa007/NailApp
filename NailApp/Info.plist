@@ -4,16 +4,18 @@
 <dict>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-		<key>NSAllowsLocalNetworking*</key>
-		<true/>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>192.168.1.5</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
 	</dict>
-	<key>CFBundleIdentifier</key>
-	<string></string>
 	<key>ServerURL</key>
 	<string>http://192.168.1.5:8080</string>
-	<key>NSLocalNetworkUsageDescription</key>
-	<string></string>
 </dict>
 </plist>
