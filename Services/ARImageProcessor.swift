@@ -14,10 +14,18 @@ class ARImageProcessor {
     private let boundary = UUID().uuidString
     
     func fetchMask(for image: UIImage, threshold: Double = 0.7) -> AnyPublisher<UIImage, Error> {
-        guard let url = URL(string: "http://localhost:8000/mask?threshold=\(threshold)") else {
+        // Используем тот же базовый URL, что и для API
+        guard let baseUrlString = Bundle.main.object(forInfoDictionaryKey: "ServerURL") as? String,
+              let baseUrl = URL(string: baseUrlString),
+              let host = baseUrl.host else {
             return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
         }
-        var req = URLRequest(url: url)
+        
+        // Формируем URL для ML-сервиса, используя тот же хост
+        let mlServiceUrl = URL(string: "http://\(host):8000/mask?threshold=\(threshold)")!
+        
+        var req = URLRequest(url: mlServiceUrl)
+        
         req.httpMethod = "POST"
         let data = image.pngData()!
         req.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")

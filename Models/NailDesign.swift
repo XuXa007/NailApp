@@ -20,14 +20,19 @@ struct NailDesign: Identifiable, Codable {
     var type: DesignType?  { DesignType(rawValue: length.lowercased()) }
     
     var imageURL: URL? {
+        // Если путь уже содержит http, это полный URL
+        if imagePath.hasPrefix("http") {
+            return URL(string: imagePath)
+        }
+        
+        // Иначе формируем URL из базового + путь
         guard let base = Bundle.main.object(forInfoDictionaryKey: "ServerURL") as? String else {
             return nil
         }
         let trimmed = base.hasSuffix("/") ? String(base.dropLast()) : base
-        return URL(string: "\(trimmed)/api/images/\(imagePath)")
+        return URL(string: "\(trimmed)/uploads/\(imagePath)")
     }
     
-    // MARK: — Custom Codable
     private enum CodingKeys: String, CodingKey {
         case id, name, description, colors
         case designType, occasion, length, material
