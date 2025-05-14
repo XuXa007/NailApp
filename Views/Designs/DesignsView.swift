@@ -19,23 +19,35 @@ struct DesignsView: View {
                     Text("Каталог")
                         .font(.largeTitle).bold()
                         .foregroundColor(.white)
+                    
                     Spacer()
-                    Button {
-                        showFilter.toggle()
-                    } label: {
-                        Label("Фильтр", systemImage: "line.horizontal.3.decrease.circle")
-                            .font(.headline)
+                    
+                    Button(action: {
+                        self.showFilter = true
+                    }) {
+                        Image(systemName: "slider.horizontal.3")
+                            .font(.system(size: 22))
                             .foregroundColor(.white)
-                            .padding(.vertical, 6)
-                            .padding(.horizontal, 12)
-                            .background(Color.white.opacity(0.2))
-                            .clipShape(Capsule())
+                            .frame(width: 50, height: 44)
+                            .background(
+                                Capsule()
+                                    .fill(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [Color.purple.opacity(0.6), Color.blue.opacity(0.6)]),
+                                            startPoint: .leading,
+                                            endPoint: .trailing
+                                        )
+                                    )
+                            )
+                            .overlay(
+                                Capsule()
+                                    .stroke(Color.white.opacity(0.4), lineWidth: 1)
+                            )
                     }
                 }
                 .padding(.horizontal)
                 .padding(.top, 16)
                 
-                // Сетка
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 16)], spacing: 16) {
                         ForEach(vm.filteredDesigns) { design in
@@ -52,12 +64,14 @@ struct DesignsView: View {
             }
         }
         .sheet(isPresented: $showFilter) {
+            print("Sheet closed")
+        } content: {
             FilterView(
                 vm: FilterViewModel(
                     filter: vm.designFilter,
                     apply: { newFilter in
                         vm.designFilter = newFilter
-                        Task { await vm.loadDesigns() }
+                        vm.applyLocalFiltering()
                     }
                 )
             )

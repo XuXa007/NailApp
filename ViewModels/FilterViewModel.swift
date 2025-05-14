@@ -11,13 +11,17 @@ class FilterViewModel: ObservableObject {
     
     private let applyAction: (DesignFilter) -> Void
     
-    init(filter: DesignFilter,
-         apply: @escaping (DesignFilter) -> Void) {
+    init(filter: DesignFilter, apply: @escaping (DesignFilter) -> Void) {
         self.filter = filter
         self.applyAction = apply
     }
     
     func apply() {
+        print("Applying filter: colors=\(filter.selectedColors.count), styles=\(filter.selectedStyles.count)")
         applyAction(filter)
+    }
+    
+    func resetFilters() {
+        filter = DesignFilter()
     }
 }

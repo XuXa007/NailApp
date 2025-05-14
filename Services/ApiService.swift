@@ -121,5 +121,73 @@ class ApiService {
         }
     }
     
+
+    func fetchDesigns(using filter: DesignFilter? = nil) async throws -> [NailDesign] {
+        if filter == nil ||
+           (filter!.selectedColors.isEmpty &&
+            filter!.selectedStyles.isEmpty &&
+            filter!.selectedSeasons.isEmpty &&
+            filter!.selectedTypes.isEmpty) {
+            
+            let comps = URLComponents(url: baseURL.appendingPathComponent("api/designs"),
+                                    resolvingAgainstBaseURL: false)
+            guard let url = comps?.url else {
+                throw ApiError.urlError
+            }
+            print("[ApiService] GET \(url.absoluteString)")
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "GET"
+            
+            let (data, response) = try await URLSession.shared.data(for: request)
+            if let http = response as? HTTPURLResponse {
+                print("[ApiService] statusCode = \(http.statusCode)")
+                if !(200..<300).contains(http.statusCode) {
+                    let body = String(data: data, encoding: .utf8) ?? "<empty body>"
+                    print("[ApiService] response body:\n\(body)")
+                    throw ApiError.badResponse
+                }
+            }
+            
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            return try decoder.decode([NailDesign].self, from: data)
+        } else {
+            return try await fetchDesignsWithFilter(filter!)
+        }
+    }
+
+    private func fetchDesignsWithFilter(_ filter: DesignFilter) async throws -> [NailDesign] {
+        let url = baseURL.appendingPathComponent("api/designs/filter")
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let filterData = [
+            "colors": Array(filter.selectedColors.map { $0.rawValue }),
+            "styles": Array(filter.selectedStyles.map { $0.rawValue }),
+            "seasons": Array(filter.selectedSeasons.map { $0.rawValue }),
+            "types": Array(filter.selectedTypes.map { $0.rawValue })
+        ]
+        
+        request.httpBody = try JSONEncoder().encode(filterData)
+        
+        print("[ApiService] POST \(url.absoluteString)")
+        print("[ApiService] Body: \(String(data: request.httpBody!, encoding: .utf8) ?? "")")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        if let http = response as? HTTPURLResponse {
+            print("[ApiService] statusCode = \(http.statusCode)")
+            if !(200..<300).contains(http.statusCode) {
+                let body = String(data: data, encoding: .utf8) ?? "<empty body>"
+                print("[ApiService] response body:\n\(body)")
+                throw ApiError.badResponse
+            }
+        }
+        
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return try decoder.decode([NailDesign].self, from: data)
+    }
     
 }

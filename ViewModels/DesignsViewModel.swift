@@ -13,36 +13,33 @@ class DesignsViewModel: ObservableObject {
         defer { isLoading = false }
         
         do {
-            //  url c query
-            let designs = try await ApiService.shared.fetchDesigns(using: designFilter)
+            let designs = try await ApiService.shared.fetchDesigns()
             allDesigns = designs
             filteredDesigns = designs
         } catch {
             print("Error loading designs:", error)
-            applyLocalFiltering()
         }
     }
     
     func applyLocalFiltering() {
         let f = designFilter
         
-        filteredDesigns = allDesigns.filter { d in
-            let colorMatch = f.selectedColors.isEmpty
-            || !Set(d.nailColors).isDisjoint(with: f.selectedColors)
-            let styleMatch = f.selectedStyles.isEmpty
-            || (d.style != nil && f.selectedStyles.contains(d.style!))
-            let seasonMatch = f.selectedSeasons.isEmpty
-            || (d.season != nil && f.selectedSeasons.contains(d.season!))
-            let typeMatch = f.selectedTypes.isEmpty
-            || (d.type != nil && f.selectedTypes.contains(d.type!))
-            let keywordMatch = f.keyword.isEmpty
-            || d.name.localizedCaseInsensitiveContains(f.keyword)
+        filteredDesigns = allDesigns.filter { design in
+            let colorMatch = f.selectedColors.isEmpty ||
+                design.colors.contains { color in
+                    f.selectedColors.contains { $0.rawValue.lowercased() == color.lowercased() }
+                }
             
-            return colorMatch
-            && styleMatch
-            && seasonMatch
-            && typeMatch
-            && keywordMatch
+            let styleMatch = f.selectedStyles.isEmpty ||
+                f.selectedStyles.contains { $0.rawValue.lowercased() == design.designType.lowercased() }
+            
+            let seasonMatch = f.selectedSeasons.isEmpty ||
+                f.selectedSeasons.contains { $0.rawValue.lowercased() == design.occasion.lowercased() }
+            
+            let typeMatch = f.selectedTypes.isEmpty ||
+                f.selectedTypes.contains { $0.rawValue.lowercased() == design.length.lowercased() }
+            
+            return colorMatch && styleMatch && seasonMatch && typeMatch
         }
     }
 }

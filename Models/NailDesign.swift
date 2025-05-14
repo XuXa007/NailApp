@@ -20,9 +20,9 @@ struct NailDesign: Identifiable, Codable {
     var type: DesignType?  { DesignType(rawValue: length.lowercased()) }
     
     var imageURL: URL? {
-        // Если путь уже содержит http, это полный URL
         if imagePath.hasPrefix("http") {
-            return URL(string: imagePath)
+            let updatedPath = imagePath.replacingOccurrences(of: "192.168.1.5", with: "192.168.1.8")
+            return URL(string: updatedPath)
         }
         
         // Иначе формируем URL из базового + путь
@@ -32,7 +32,6 @@ struct NailDesign: Identifiable, Codable {
         let trimmed = base.hasSuffix("/") ? String(base.dropLast()) : base
         return URL(string: "\(trimmed)/uploads/\(imagePath)")
     }
-    
     private enum CodingKeys: String, CodingKey {
         case id, name, description, colors
         case designType, occasion, length, material

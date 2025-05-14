@@ -21,43 +21,12 @@ struct MainTabView: View {
     var body: some View {
         TabView {
             NavigationStack {
-                ZStack {
-                    LinearGradient(
-                        gradient: Gradient(colors: [Color.purple.opacity(0.3), Color.blue.opacity(0.3)]),
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                    .ignoresSafeArea()
-                    
-                    ScrollView {
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 16)], spacing: 16) {
-                            ForEach(designsVM.filteredDesigns) { design in
-                                NavigationLink {
-                                    DesignDetailView(design: design)
-                                        .environmentObject(favVM)
-                                } label: {
-                                    DesignCardView(design: design)
-                                }
-                            }
-                        }
-                        .padding(16)
-                    }
-                }
-                .navigationTitle("Designs")
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button { /* открыть фильтры */ } label: {
-                            Image(systemName: "slider.horizontal.3")
-                                .foregroundColor(.white)
-                        }
-                    }
-                }
-                .task { await designsVM.loadDesigns() }
-                .environmentObject(designsVM)
-                .environmentObject(favVM)
+                DesignsView()
+                    .environmentObject(designsVM)
+                    .environmentObject(favVM)
             }
             .tabItem {
-                Label("Designs", systemImage: "square.grid.2x2.fill")
+                Label("Каталог", systemImage: "square.grid.2x2.fill")
             }
             
             NavigationStack {
@@ -66,13 +35,12 @@ struct MainTabView: View {
                     .environmentObject(favVM)
             }
             .tabItem {
-                Label("Profile", systemImage: "person.crop.circle.fill")
+                Label("Профиль", systemImage: "person.crop.circle.fill")
             }
         }
     }
 }
 
-//  для градиентного UIImage
 private extension UIImage {
     static func gradientImage(colors: [UIColor], size: CGSize) -> UIImage {
         let renderer = UIGraphicsImageRenderer(size: size)

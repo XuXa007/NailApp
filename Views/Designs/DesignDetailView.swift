@@ -46,7 +46,7 @@ struct DesignDetailView: View {
                             favVM.toggle(design)
                         } label: {
                             Label(
-                                favVM.isFavorite(design) ? "Unfavorite" : "Favorite",
+                                favVM.isFavorite(design) ? "Убрать из избранного" : "В избранное",
                                 systemImage: favVM.isFavorite(design) ? "heart.fill" : "heart"
                             )
                         }
@@ -55,7 +55,7 @@ struct DesignDetailView: View {
                         NavigationLink {
                             ARTryOnView()
                         } label: {
-                            Label("Try On", systemImage: "sparkles")
+                            Label("Примерить", systemImage: "sparkles")
                         }
                         .buttonStyle(ActionButtonStyle())
                     }
@@ -84,7 +84,7 @@ struct DesignDetailView: View {
     
     private var detailsCard: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Details")
+            Text("Детали")
                 .font(.headline)
                 .foregroundColor(.white)
             
@@ -98,10 +98,10 @@ struct DesignDetailView: View {
             }
             
             VStack(spacing: 8) {
-                InfoRow(label: "Style", value: design.designType.capitalized)
-                InfoRow(label: "Season", value: design.occasion.capitalized)
-                InfoRow(label: "Length", value: design.length.capitalized)
-                InfoRow(label: "Material", value: design.material.capitalized)
+                InfoRow(label: "Стиль", value: localizedValue(design.designType))
+                InfoRow(label: "Сезон", value: localizedValue(design.occasion))
+                InfoRow(label: "Длина", value: localizedValue(design.length))
+                InfoRow(label: "Материал", value: localizedValue(design.material))
             }
         }
         .padding()
@@ -115,6 +115,34 @@ struct DesignDetailView: View {
         )
         .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
         .padding(.horizontal)
+    }
+
+    private func localizedValue(_ value: String) -> String {
+        switch value.lowercased() {
+
+        case "french": return "Френч"
+        case "ombre": return "Омбре"
+        case "matte": return "Матовый"
+        case "glitter": return "Блестки"
+        
+        case "spring": return "Весна"
+        case "summer": return "Лето"
+        case "autumn", "fall": return "Осень"
+        case "winter": return "Зима"
+        case "everyday": return "Повседневный"
+        case "party": return "Праздничный"
+            
+        case "short": return "Короткие"
+        case "medium": return "Средние"
+        case "long": return "Длинные"
+            
+        case "gel": return "Гель"
+        case "acrylic": return "Акрил"
+        case "regular": return "Обычный"
+        case "polygel": return "Полигель"
+            
+        default: return value.capitalized
+        }
     }
 }
 
