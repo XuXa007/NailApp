@@ -2,140 +2,247 @@ import SwiftUI
 import Combine
 
 struct ARTryOnView: View {
+    // Дизайн передается при создании компонента
+    let design: NailDesign
+    
     @StateObject private var vm = ARViewModel()
     @State private var inputImage: UIImage?
     @State private var showPicker = false
-    @State private var selectedDesign: NailDesign?
-    @State private var showDesignSelector = false
+    @State private var showShareSheet = false
     
     var body: some View {
-        NavigationView {
+        ZStack {
+            // Градиентный фон
+            LinearGradient(
+                gradient: Gradient(colors: [Color.purple.opacity(0.3), Color.blue.opacity(0.3)]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
             VStack(spacing: 20) {
+                // Заголовок
+                Text("Виртуальная примерка")
+                    .font(.largeTitle).bold()
+                    .foregroundColor(.white)
+                    .padding(.top, 16)
+                
+                // Информация о выбранном дизайне
                 VStack {
-                    Text("Выбранный дизайн")
-                        .font(.headline)
+                    HStack {
+                        Text("Выбранный дизайн")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        Spacer()
+                    }
+                    .padding(.horizontal)
                     
-                    if let design = selectedDesign {
-                        HStack {
-                            AsyncImage(url: design.imageURL) { phase in
-                                switch phase {
-                                case .empty: ProgressView()
-                                case .success(let image): image.resizable().scaledToFit()
-                                case .failure: Image(systemName: "exclamationmark.triangle").foregroundColor(.red)
-                                @unknown default: EmptyView()
-                                }
-                            }
-                            .frame(width: 100, height: 100)
-                            .cornerRadius(8)
-                            
-                            VStack(alignment: .leading) {
-                                Text(design.name)
-                                    .font(.title3)
-                                    .bold()
-                                Text(design.description)
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                    HStack {
+                        AsyncImage(url: design.imageURL) { phase in
+                            switch phase {
+                            case .empty: ProgressView()
+                            case .success(let image): image.resizable().scaledToFit()
+                            case .failure: Image(systemName: "exclamationmark.triangle").foregroundColor(.red)
+                            @unknown default: EmptyView()
                             }
                         }
-                        .padding()
+                        .frame(width: 80, height: 80)
+                        .cornerRadius(8)
+                        
+                        VStack(alignment: .leading) {
+                            Text(design.name)
+                                .font(.title3)
+                                .bold()
+                                .foregroundColor(.white)
+                            Text(design.description)
+                                .font(.caption)
+                                .foregroundColor(.white.opacity(0.7))
+                        }
+                        
+                        Spacer()
+                    }
+                    .padding()
+                    .background(Color.white.opacity(0.1))
+                    .cornerRadius(12)
+                    .padding(.horizontal)
+                }
+                
+                VStack {
+                    HStack {
+                        Text(vm.resultImage == nil ? "Ваше фото" : "Результат")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        Spacer()
+                    }
+                    .padding(.horizontal)
+                    
+                    if vm.isLoading {
+                        VStack {
+                            ProgressView()
+                                .scaleEffect(1.5)
+                                .padding()
+                            Text("Обработка изображения...")
+                                .foregroundColor(.white)
+                        }
+                        .frame(height: 300)
+                        .frame(maxWidth: .infinity)
                         .background(Color.white.opacity(0.1))
                         .cornerRadius(12)
-                    } else {
-                        Button("Выбрать дизайн") {
-                            showDesignSelector = true
+                        .padding(.horizontal)
+                    } else if let resultImage = vm.resultImage {
+                        // Показываем результат
+                        ZStack {
+                            Image(uiImage: resultImage)
+                                .resizable()
+                                .scaledToFit()
+                                .cornerRadius(12)
+                            
+                            VStack {
+                                Spacer()
+                                HStack {
+                                    Button {
+                                        // Сбросить результат и начать заново
+                                        vm.resultImage = nil
+                                    } label: {
+                                        HStack {
+                                            Image(systemName: "arrow.backward")
+                                            Text("Назад")
+                                        }
+                                        .padding(.vertical, 10)
+                                        .padding(.horizontal, 16)
+                                        .background(Color.black.opacity(0.5))
+                                        .cornerRadius(20)
+                                        .foregroundColor(.white)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    Button {
+                                        showShareSheet = true
+                                    } label: {
+                                        HStack {
+                                            Image(systemName: "square.and.arrow.up")
+                                            Text("Поделиться")
+                                        }
+                                        .padding(.vertical, 10)
+                                        .padding(.horizontal, 16)
+                                        .background(Color.black.opacity(0.5))
+                                        .cornerRadius(20)
+                                        .foregroundColor(.white)
+                                    }
+                                }
+                                .padding()
+                            }
                         }
-                        .buttonStyle(.borderedProminent)
-                    }
-                }
-                .padding(.bottom)
-                
-                if vm.isLoading {
-                    ProgressView("Обработка...")
-                        .padding()
-                } else if let resultImage = vm.resultImage {
-                    Text("Результат примерки")
-                        .font(.headline)
-                    Image(uiImage: resultImage)
-                        .resizable()
-                        .scaledToFit()
-                        .cornerRadius(12)
-                } else {
-                    VStack {
-                        Text("Фото ваших рук")
-                            .font(.headline)
-                        
-                        if let inputImage = inputImage {
+                        .padding(.horizontal)
+                    } else if let inputImage = inputImage {
+                        ZStack {
                             Image(uiImage: inputImage)
                                 .resizable()
                                 .scaledToFit()
-                                .frame(height: 200)
                                 .cornerRadius(12)
-                        } else {
-                            Button("Сделать фото рук") {
-                                showPicker = true
+                            
+                            VStack {
+                                Spacer()
+                                HStack {
+                                    Button {
+                                        // Сбросить фото
+                                        self.inputImage = nil
+                                    } label: {
+                                        HStack {
+                                            Image(systemName: "xmark")
+                                            Text("Другое фото")
+                                        }
+                                        .padding(.vertical, 10)
+                                        .padding(.horizontal, 16)
+                                        .background(Color.black.opacity(0.5))
+                                        .cornerRadius(20)
+                                        .foregroundColor(.white)
+                                    }
+                                }
+                                .padding()
                             }
-                            .buttonStyle(.borderedProminent)
                         }
+                        .padding(.horizontal)
+                    } else {
+                        Button {
+                            showPicker = true
+                        } label: {
+                            VStack {
+                                Image(systemName: "camera.fill")
+                                    .font(.system(size: 30))
+                                    .padding(.bottom, 5)
+                                Text("Сделать фото рук")
+                            }
+                            .padding()
+                            .frame(height: 200)
+                            .frame(maxWidth: .infinity)
+                            .background(Color.white.opacity(0.2))
+                            .cornerRadius(12)
+                            .foregroundColor(.white)
+                        }
+                        .padding(.horizontal)
                     }
                 }
                 
-                if let _ = inputImage, let design = selectedDesign, let designURL = design.imageURL {
-                    Button("Примерить дизайн") {
-                        // Fixed: Properly unwrap the optional URL
-                        vm.tryOnDesign(handImage: inputImage!, designURL: designURL)
+                if let _ = inputImage, let _ = design.imageURL, vm.resultImage == nil {
+                    Button {
+                        vm.tryOnDesign(handImage: inputImage!, design: design)
+                    } label: {
+                        HStack {
+                            Image(systemName: "sparkles")
+                            Text("Применить дизайн")
+                                .font(.headline)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(
+                            LinearGradient(
+                                gradient: Gradient(colors: [Color.purple, Color.blue]),
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(12)
+                        .foregroundColor(.white)
+                        .shadow(color: Color.purple.opacity(0.3), radius: 5, x: 0, y: 3)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.green)
-                    .padding()
+                    .padding(.horizontal)
                 }
                 
                 if let error = vm.errorMessage {
                     Text(error)
+                        .font(.caption)
                         .foregroundColor(.red)
                         .padding()
+                        .background(Color.white.opacity(0.2))
+                        .cornerRadius(8)
+                        .padding(.horizontal)
                 }
                 
                 Spacer()
             }
-            .padding()
-            .navigationTitle("Примерка дизайна")
-            .sheet(isPresented: $showPicker) {
-                ImagePickerView(image: $inputImage)
-            }
-            .sheet(isPresented: $showDesignSelector) {
-                DesignSelectorView(selectedDesign: $selectedDesign)
+            .padding(.vertical)
+        }
+        .sheet(isPresented: $showPicker) {
+            ImagePickerView(image: $inputImage)
+        }
+        .sheet(isPresented: $showShareSheet) {
+            if let resultImage = vm.resultImage {
+                ShareSheet(items: [resultImage])
             }
         }
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
-struct DesignSelectorView: View {
-    @EnvironmentObject var designsVM: DesignsViewModel
-    @Binding var selectedDesign: NailDesign?
-    @Environment(\.dismiss) var dismiss
+struct ShareSheet: UIViewControllerRepresentable {
+    var items: [Any]
     
-    var body: some View {
-        NavigationView {
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 16)], spacing: 16) {
-                    ForEach(designsVM.filteredDesigns) { design in
-                        DesignCardView(design: design)
-                            .onTapGesture {
-                                selectedDesign = design
-                                dismiss()
-                            }
-                    }
-                }
-                .padding()
-            }
-            .navigationTitle("Выберите дизайн")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Отмена") {
-                        dismiss()
-                    }
-                }
-            }
-        }
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        let controller = UIActivityViewController(activityItems: items, applicationActivities: nil)
+        return controller
     }
+    
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }

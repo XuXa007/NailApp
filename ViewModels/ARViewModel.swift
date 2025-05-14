@@ -13,47 +13,21 @@ class ARViewModel: ObservableObject {
     private let processor = ARImageProcessor()
     private var cancellables = Set<AnyCancellable>()
     
-    func tryOnDesign(handImage: UIImage, designURL: URL) {
+    func tryOnDesign(handImage: UIImage, design: NailDesign) {
         isLoading = true
         errorMessage = nil
         resultImage = nil
         
-        URLSession.shared.dataTaskPublisher(for: designURL)
-            .map { UIImage(data: $0.data) }
-            .compactMap { $0 }
-            .mapError { $0 as Error }
-            .flatMap { [weak self] designImage -> AnyPublisher<UIImage, Error> in
-                guard let self = self else {
-                    return Fail(error: URLError(.cancelled)).eraseToAnyPublisher()
-                }
-                return self.processor.tryOnDesign(base: handImage, design: designImage)
-            }
+        processor.tryOnDesign(base: handImage, design: design)
             .receive(on: RunLoop.main)
             .sink { [weak self] completion in
                 self?.isLoading = false
                 if case let .failure(error) = completion {
-                    self?.errorMessage = "Ошибка: \(error.localizedDescription)"
+                    self?.errorMessage = "Ошибка обработки: \(error.localizedDescription)"
                 }
             } receiveValue: { [weak self] resultImage in
                 self?.resultImage = resultImage
-            }
-            .store(in: &cancellables)
-    }
-    
-    func generateMask(from handImage: UIImage) {
-        isLoading = true
-        errorMessage = nil
-        maskImage = nil
-        
-        processor.fetchMask(for: handImage)
-            .receive(on: RunLoop.main)
-            .sink { [weak self] completion in
-                self?.isLoading = false
-                if case let .failure(error) = completion {
-                    self?.errorMessage = "Ошибка создания маски: \(error.localizedDescription)"
-                }
-            } receiveValue: { [weak self] mask in
-                self?.maskImage = mask
+                self?.errorMessage = nil
             }
             .store(in: &cancellables)
     }
