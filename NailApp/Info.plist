@@ -15,6 +15,6 @@
 		</dict>
 	</dict>
 	<key>ServerURL</key>
-	<string>http://192.168.1.8:8080</string>
+	<string>http://172.20.10.7:8080</string>
 </dict>
 </plist>

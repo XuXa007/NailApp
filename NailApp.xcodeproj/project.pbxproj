@@ -42,6 +42,7 @@
 		C9F563342DCEB23300706027 /* DesignFilters.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9F5630E2DCEAFFB00706027 /* DesignFilters.swift */; };
 		C9F563352DCEB23700706027 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9F5630D2DCEAFF400706027 /* UserProfile.swift */; };
 		C9F563362DCEB23B00706027 /* NailDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9F5630C2DCEAFEF00706027 /* NailDesign.swift */; };
+		C9FF61892DD5BB44007D36F8 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9FF61882DD5BB40007D36F8 /* Config.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -100,6 +101,7 @@
 		C9F5631C2DCEB06500706027 /* DesignsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignsView.swift; sourceTree = "<group>"; };
 		C9F5631D2DCEB06B00706027 /* DesignDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignDetailView.swift; sourceTree = "<group>"; };
 		C9F5631E2DCEB07300706027 /* FilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterView.swift; sourceTree = "<group>"; };
+		C9FF61882DD5BB40007D36F8 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -161,6 +163,7 @@
 		C9B5FCE12DCD4C4F0042038A = {
 			isa = PBXGroup;
 			children = (
+				C9FF61882DD5BB40007D36F8 /* Config.swift */,
 				C9CA6ABC2DCF7B4200CF8BF1 /* Shared */,
 				C9CA6AB42DCF7AC800CF8BF1 /* ViewModels */,
 				C9F563122DCEB02100706027 /* Views */,
@@ -458,6 +461,7 @@
 				C9CA6AAB2DCF7A9C00CF8BF1 /* LoginView.swift in Sources */,
 				C9BB96332DD0B5C900E718CC /* InfoRow.swift in Sources */,
 				C9BB963B2DD0BA6100E718CC /* FavoritesSectionView.swift in Sources */,
+				C9FF61892DD5BB44007D36F8 /* Config.swift in Sources */,
 				C9BB962F2DD0B26000E718CC /* ActionButtonStyle.swift in Sources */,
 				C9CA6AC22DCF7D7F00CF8BF1 /* LoadingView.swift in Sources */,
 				C9CA6AD52DCF87C500CF8BF1 /* DesignType.swift in Sources */,

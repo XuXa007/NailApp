@@ -40,10 +40,14 @@ class ARImageProcessor {
         var req = URLRequest(url: finalUrl)
         req.httpMethod = "POST"
         
-        guard let baseData = base.jpegData(compressionQuality: 0.8) else {
+        // Изменить размер изображения и сжать его перед отправкой
+        let resizedImage = resizeImageIfNeeded(base, maxDimension: 1200)
+        guard let baseData = resizedImage.jpegData(compressionQuality: 0.7) else {
             print("Ошибка: не удалось преобразовать изображение руки в JPEG")
             return Fail(error: URLError(.cannotDecodeRawData)).eraseToAnyPublisher()
         }
+        
+        print("Размер отправляемого изображения: \(baseData.count) байт")
         
         let designId = design.id
         print("ID дизайна: \(designId)")
@@ -56,6 +60,9 @@ class ARImageProcessor {
             ]
         )
         
+        // Увеличиваем таймаут запроса
+        req.timeoutInterval = 60.0 // 60 секунд
+        
         print("Отправка запроса на сервер...")
         
         return URLSession.shared.dataTaskPublisher(for: req)
@@ -66,6 +73,7 @@ class ARImageProcessor {
                 }
                 
                 print("Получен ответ от сервера с кодом: \(httpResp.statusCode)")
+                print("Размер ответа: \(data.count) байт")
                 
                 if !(200...299).contains(httpResp.statusCode) {
                     let respString = String(data: data, encoding: .utf8) ?? "Unknown error"
@@ -85,12 +93,57 @@ class ARImageProcessor {
             .eraseToAnyPublisher()
     }
     
+    // Добавить новый метод для изменения размера изображения
+    private func resizeImageIfNeeded(_ image: UIImage, maxDimension: CGFloat = 1200) -> UIImage {
+        let size = image.size
+        
+        // Если изображение уже меньше максимального размера, вернуть его как есть
+        if size.width <= maxDimension && size.height <= maxDimension {
+            return image
+        }
+        
+        // Вычисляем новые размеры, сохраняя соотношение сторон
+        var newWidth: CGFloat
+        var newHeight: CGFloat
+        
+        if size.width > size.height {
+            newWidth = maxDimension
+            newHeight = size.height * maxDimension / size.width
+        } else {
+            newHeight = maxDimension
+            newWidth = size.width * maxDimension / size.height
+        }
+        
+        let targetSize = CGSize(width: newWidth, height: newHeight)
+        
+        // Изменяем размер изображения
+        UIGraphicsBeginImageContextWithOptions(targetSize, false, 1.0)
+        image.draw(in: CGRect(origin: .zero, size: targetSize))
+        let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        print("Изображение изменено с \(size.width)x\(size.height) на \(newWidth)x\(newHeight)")
+        
+        return resizedImage ?? image
+    }
+    
     private func createMultipartBody(parts: [(name: String, data: Data, filename: String)]) -> Data {
         var body = Data()
         let lineBreak = "\r\n"
         
         for part in parts {
             body.append("--\(boundary)\(lineBreak)")
+            
+            var partData = part.data
+            if part.filename.hasSuffix(".jpg") || part.filename.hasSuffix(".jpeg") {
+                if partData.count > 1_000_000 { // 1MB
+                    if let image = UIImage(data: partData),
+                       let compressedData = image.jpegData(compressionQuality: 0.5) {
+                        partData = compressedData
+                        print("Изображение сжато с \(part.data.count) до \(partData.count) байт")
+                    }
+                }
+            }
             
             if !part.filename.isEmpty {
                 body.append("Content-Disposition: form-data; name=\"\(part.name)\"; filename=\"\(part.filename)\"\(lineBreak)")
@@ -99,7 +152,7 @@ class ARImageProcessor {
                 body.append("Content-Disposition: form-data; name=\"\(part.name)\"\(lineBreak)\(lineBreak)")
             }
             
-            body.append(part.data)
+            body.append(partData)
             body.append(lineBreak)
         }
         
