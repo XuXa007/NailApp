@@ -14,9 +14,8 @@ class ARImageProcessor {
     private let boundary = UUID().uuidString
     
     func tryOnDesign(base: UIImage, design: NailDesign, threshold: Double = 0.7, opacity: Double = 0.9) -> AnyPublisher<UIImage, Error> {
-        guard let baseUrlString = Bundle.main.object(forInfoDictionaryKey: "ServerURL") as? String,
-              let baseUrl = URL(string: baseUrlString) else {
-            print("Ошибка: не удалось получить базовый URL из Info.plist")
+        guard let baseUrl = URL(string: Config.baseURL) else {
+            print("Ошибка: не удалось создать URL из Config.baseURL: \(Config.baseURL)")
             return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
         }
         
@@ -40,9 +39,9 @@ class ARImageProcessor {
         var req = URLRequest(url: finalUrl)
         req.httpMethod = "POST"
         
-        // Изменить размер изображения и сжать его перед отправкой
+        // Оптимизировать размер изображения перед отправкой
         let resizedImage = resizeImageIfNeeded(base, maxDimension: 1200)
-        guard let baseData = resizedImage.jpegData(compressionQuality: 0.7) else {
+        guard let baseData = resizedImage.jpegData(compressionQuality: 0.85) else {
             print("Ошибка: не удалось преобразовать изображение руки в JPEG")
             return Fail(error: URLError(.cannotDecodeRawData)).eraseToAnyPublisher()
         }
@@ -93,7 +92,7 @@ class ARImageProcessor {
             .eraseToAnyPublisher()
     }
     
-    // Добавить новый метод для изменения размера изображения
+    // Добавить метод для изменения размера изображения
     private func resizeImageIfNeeded(_ image: UIImage, maxDimension: CGFloat = 1200) -> UIImage {
         let size = image.size
         
@@ -138,7 +137,7 @@ class ARImageProcessor {
             if part.filename.hasSuffix(".jpg") || part.filename.hasSuffix(".jpeg") {
                 if partData.count > 1_000_000 { // 1MB
                     if let image = UIImage(data: partData),
-                       let compressedData = image.jpegData(compressionQuality: 0.5) {
+                       let compressedData = image.jpegData(compressionQuality: 0.7) {
                         partData = compressedData
                         print("Изображение сжато с \(part.data.count) до \(partData.count) байт")
                     }

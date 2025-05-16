@@ -187,7 +187,15 @@ struct ARTryOnView: View {
                 
                 if let _ = inputImage, let _ = design.imageURL, vm.resultImage == nil {
                     Button {
-                        vm.tryOnDesign(handImage: inputImage!, design: design)
+                        // Показать спиннер перед обработкой
+                        withAnimation {
+                            vm.isLoading = true
+                        }
+                        
+                        // Добавим таймер на 1 секунду для отображения спиннера
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            vm.tryOnDesign(handImage: inputImage!, design: design)
+                        }
                     } label: {
                         HStack {
                             Image(systemName: "sparkles")
