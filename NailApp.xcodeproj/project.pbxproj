@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C9B9858C2DD763650026673F /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9B9858B2DD763630026673F /* CameraViewModel.swift */; };
+		C9B9858E2DD7636E0026673F /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9B9858D2DD7636D0026673F /* CameraView.swift */; };
+		C9B985902DD763920026673F /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9B9858F2DD763910026673F /* CameraPreviewView.swift */; };
+		C9B985922DD764260026673F /* HandDetectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9B985912DD764250026673F /* HandDetectionManager.swift */; };
 		C9BB962F2DD0B26000E718CC /* ActionButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9BB962E2DD0B25E00E718CC /* ActionButtonStyle.swift */; };
 		C9BB96332DD0B5C900E718CC /* InfoRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9BB96322DD0B5C800E718CC /* InfoRow.swift */; };
 		C9BB96352DD0B60C00E718CC /* ColorChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9BB96342DD0B60B00E718CC /* ColorChip.swift */; };
@@ -66,6 +70,10 @@
 		C9B5FCEA2DCD4C4F0042038A /* NailApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NailApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9B5FCFA2DCD4C500042038A /* NailAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NailAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9B5FD042DCD4C500042038A /* NailAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NailAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C9B9858B2DD763630026673F /* CameraViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewModel.swift; sourceTree = "<group>"; };
+		C9B9858D2DD7636D0026673F /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		C9B9858F2DD763910026673F /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
+		C9B985912DD764250026673F /* HandDetectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandDetectionManager.swift; sourceTree = "<group>"; };
 		C9BB962E2DD0B25E00E718CC /* ActionButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionButtonStyle.swift; sourceTree = "<group>"; };
 		C9BB96322DD0B5C800E718CC /* InfoRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoRow.swift; sourceTree = "<group>"; };
 		C9BB96342DD0B60B00E718CC /* ColorChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorChip.swift; sourceTree = "<group>"; };
@@ -186,6 +194,16 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		C9B985932DD764680026673F /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				C9B9858D2DD7636D0026673F /* CameraView.swift */,
+				C9B985912DD764250026673F /* HandDetectionManager.swift */,
+				C9CA6AB22DCF7AC200CF8BF1 /* ImagePickerView.swift */,
+			);
+			path = Camera;
+			sourceTree = "<group>";
+		};
 		C9CA6AA42DCF7A3B00CF8BF1 /* Favorites */ = {
 			isa = PBXGroup;
 			children = (
@@ -208,7 +226,7 @@
 		C9CA6AAF2DCF7AB000CF8BF1 /* AR */ = {
 			isa = PBXGroup;
 			children = (
-				C9CA6AB22DCF7AC200CF8BF1 /* ImagePickerView.swift */,
+				C9B9858F2DD763910026673F /* CameraPreviewView.swift */,
 				C9CA6AB02DCF7AB700CF8BF1 /* ARTryOnView.swift */,
 			);
 			path = AR;
@@ -217,6 +235,7 @@
 		C9CA6AB42DCF7AC800CF8BF1 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				C9B9858B2DD763630026673F /* CameraViewModel.swift */,
 				C9CA6AB92DCF7B2300CF8BF1 /* FilterViewModel.swift */,
 				C9CA6AB82DCF7AF600CF8BF1 /* ARViewModel.swift */,
 				C9CA6AB72DCF7AE900CF8BF1 /* AuthViewModel.swift */,
@@ -277,6 +296,7 @@
 		C9F563122DCEB02100706027 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				C9B985932DD764680026673F /* Camera */,
 				C9CA6AAF2DCF7AB000CF8BF1 /* AR */,
 				C9CA6AA72DCF7A8F00CF8BF1 /* Profile */,
 				C9CA6AA42DCF7A3B00CF8BF1 /* Favorites */,
@@ -443,6 +463,7 @@
 				C9CA6AA62DCF7A4100CF8BF1 /* FavoritesView.swift in Sources */,
 				C9CA6AC92DCF7D9D00CF8BF1 /* DesignsViewModel.swift in Sources */,
 				C9CA6AA92DCF7A9600CF8BF1 /* ProfileView.swift in Sources */,
+				C9B985902DD763920026673F /* CameraPreviewView.swift in Sources */,
 				C9F563342DCEB23300706027 /* DesignFilters.swift in Sources */,
 				C9BB96352DD0B60C00E718CC /* ColorChip.swift in Sources */,
 				C9CA6AC62DCF7D9000CF8BF1 /* ARViewModel.swift in Sources */,
@@ -462,6 +483,7 @@
 				C9BB96332DD0B5C900E718CC /* InfoRow.swift in Sources */,
 				C9BB963B2DD0BA6100E718CC /* FavoritesSectionView.swift in Sources */,
 				C9FF61892DD5BB44007D36F8 /* Config.swift in Sources */,
+				C9B9858E2DD7636E0026673F /* CameraView.swift in Sources */,
 				C9BB962F2DD0B26000E718CC /* ActionButtonStyle.swift in Sources */,
 				C9CA6AC22DCF7D7F00CF8BF1 /* LoadingView.swift in Sources */,
 				C9CA6AD52DCF87C500CF8BF1 /* DesignType.swift in Sources */,
@@ -474,8 +496,10 @@
 				C9CA6AC72DCF7D9400CF8BF1 /* AuthViewModel.swift in Sources */,
 				C9CA6AC32DCF7D8300CF8BF1 /* FeatureCardView.swift in Sources */,
 				C9BB96392DD0B7A700E718CC /* ProfileActionButtonStyle.swift in Sources */,
+				C9B985922DD764260026673F /* HandDetectionManager.swift in Sources */,
 				C9CA6AB32DCF7AC300CF8BF1 /* ImagePickerView.swift in Sources */,
 				C9CA6AD02DCF87A900CF8BF1 /* NailStyle.swift in Sources */,
+				C9B9858C2DD763650026673F /* CameraViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -642,7 +666,10 @@
 				INFOPLIST_FILE = NailApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Доступ к камере нужен для фотографирования рук и виртуальной примерки дизайна";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -675,7 +702,10 @@
 				INFOPLIST_FILE = NailApp/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "";
 				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Доступ к камере нужен для фотографирования рук и виртуальной примерки дизайна";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

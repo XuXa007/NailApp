@@ -11,6 +11,7 @@ extension Data {
 }
 
 class ARImageProcessor {
+    var cancellables = Set<AnyCancellable>()
     private let boundary = UUID().uuidString
     
     func tryOnDesign(base: UIImage, design: NailDesign, threshold: Double = 0.7, opacity: Double = 0.9) -> AnyPublisher<UIImage, Error> {
@@ -40,7 +41,7 @@ class ARImageProcessor {
         req.httpMethod = "POST"
         
         // Оптимизировать размер изображения перед отправкой
-        let resizedImage = resizeImageIfNeeded(base, maxDimension: 1200)
+        let resizedImage = resizeImageIfNeeded(base, maxDimension: Config.TryOn.maxImageDimension)
         guard let baseData = resizedImage.jpegData(compressionQuality: 0.85) else {
             print("Ошибка: не удалось преобразовать изображение руки в JPEG")
             return Fail(error: URLError(.cannotDecodeRawData)).eraseToAnyPublisher()
@@ -92,7 +93,7 @@ class ARImageProcessor {
             .eraseToAnyPublisher()
     }
     
-    // Добавить метод для изменения размера изображения
+    // Метод для изменения размера изображения
     private func resizeImageIfNeeded(_ image: UIImage, maxDimension: CGFloat = 1200) -> UIImage {
         let size = image.size
         
