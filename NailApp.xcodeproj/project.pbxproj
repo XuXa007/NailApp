@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C92F2D8F2DD7B31000FC6ADA /* HandImageOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C92F2D8E2DD7B30F00FC6ADA /* HandImageOverlayView.swift */; };
 		C9B9858C2DD763650026673F /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9B9858B2DD763630026673F /* CameraViewModel.swift */; };
 		C9B9858E2DD7636E0026673F /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9B9858D2DD7636D0026673F /* CameraView.swift */; };
 		C9B985902DD763920026673F /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9B9858F2DD763910026673F /* CameraPreviewView.swift */; };
@@ -67,6 +68,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		C92F2D8E2DD7B30F00FC6ADA /* HandImageOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandImageOverlayView.swift; sourceTree = "<group>"; };
 		C9B5FCEA2DCD4C4F0042038A /* NailApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NailApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9B5FCFA2DCD4C500042038A /* NailAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NailAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9B5FD042DCD4C500042038A /* NailAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NailAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -197,6 +199,7 @@
 		C9B985932DD764680026673F /* Camera */ = {
 			isa = PBXGroup;
 			children = (
+				C92F2D8E2DD7B30F00FC6ADA /* HandImageOverlayView.swift */,
 				C9B9858D2DD7636D0026673F /* CameraView.swift */,
 				C9B985912DD764250026673F /* HandDetectionManager.swift */,
 				C9CA6AB22DCF7AC200CF8BF1 /* ImagePickerView.swift */,
@@ -465,6 +468,7 @@
 				C9CA6AA92DCF7A9600CF8BF1 /* ProfileView.swift in Sources */,
 				C9B985902DD763920026673F /* CameraPreviewView.swift in Sources */,
 				C9F563342DCEB23300706027 /* DesignFilters.swift in Sources */,
+				C92F2D8F2DD7B31000FC6ADA /* HandImageOverlayView.swift in Sources */,
 				C9BB96352DD0B60C00E718CC /* ColorChip.swift in Sources */,
 				C9CA6AC62DCF7D9000CF8BF1 /* ARViewModel.swift in Sources */,
 				C9CA6ABB2DCF7B3600CF8BF1 /* AuthService.swift in Sources */,

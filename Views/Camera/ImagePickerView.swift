@@ -10,7 +10,7 @@ struct ImagePickerView: View {
     var body: some View {
         Group {
             if useCamera {
-                // Используем нашу кастомную камеру
+                // Используем нашу упрощенную камеру
                 CameraView(capturedImage: $image)
             } else {
                 // Используем стандартный пикер для галереи
@@ -85,7 +85,7 @@ struct StandardImagePicker: UIViewControllerRepresentable {
         
         private func processImageForML(_ image: UIImage) -> UIImage {
             // Приводим изображение к оптимальному размеру для ML
-            let maxDimension: CGFloat = Config.TryOn.maxImageDimension
+            let maxDimension: CGFloat = 1200 // Используем зафиксированное значение вместо Config
             let size = image.size
             
             // Если изображение уже подходящего размера
