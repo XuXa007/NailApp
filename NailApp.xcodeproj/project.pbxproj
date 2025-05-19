@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C92F2D8F2DD7B31000FC6ADA /* HandImageOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C92F2D8E2DD7B30F00FC6ADA /* HandImageOverlayView.swift */; };
+		C9404CE22DDA240C001382F2 /* CacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9404CE12DDA240B001382F2 /* CacheManager.swift */; };
 		C9B9858C2DD763650026673F /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9B9858B2DD763630026673F /* CameraViewModel.swift */; };
 		C9B9858E2DD7636E0026673F /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9B9858D2DD7636D0026673F /* CameraView.swift */; };
 		C9B985902DD763920026673F /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9B9858F2DD763910026673F /* CameraPreviewView.swift */; };
@@ -69,6 +70,7 @@
 
 /* Begin PBXFileReference section */
 		C92F2D8E2DD7B30F00FC6ADA /* HandImageOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandImageOverlayView.swift; sourceTree = "<group>"; };
+		C9404CE12DDA240B001382F2 /* CacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheManager.swift; sourceTree = "<group>"; };
 		C9B5FCEA2DCD4C4F0042038A /* NailApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NailApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9B5FCFA2DCD4C500042038A /* NailAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NailAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9B5FD042DCD4C500042038A /* NailAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NailAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -251,6 +253,7 @@
 		C9CA6ABC2DCF7B4200CF8BF1 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				C9404CE12DDA240B001382F2 /* CacheManager.swift */,
 				C9BB96382DD0B7A600E718CC /* ProfileActionButtonStyle.swift */,
 				C9BB96342DD0B60B00E718CC /* ColorChip.swift */,
 				C9BB96322DD0B5C800E718CC /* InfoRow.swift */,
@@ -489,6 +492,7 @@
 				C9FF61892DD5BB44007D36F8 /* Config.swift in Sources */,
 				C9B9858E2DD7636E0026673F /* CameraView.swift in Sources */,
 				C9BB962F2DD0B26000E718CC /* ActionButtonStyle.swift in Sources */,
+				C9404CE22DDA240C001382F2 /* CacheManager.swift in Sources */,
 				C9CA6AC22DCF7D7F00CF8BF1 /* LoadingView.swift in Sources */,
 				C9CA6AD52DCF87C500CF8BF1 /* DesignType.swift in Sources */,
 				C9CA6AC52DCF7D8C00CF8BF1 /* FilterViewModel.swift in Sources */,
