@@ -15,9 +15,12 @@ struct NailDesign: Identifiable, Codable {
     var nailColors: [NailColor] {
         colors.compactMap { NailColor(rawValue: $0.lowercased()) }
     }
+    
     var style: NailStyle? { NailStyle(rawValue: designType.lowercased()) }
-    var season: Season?    { Season(rawValue: occasion.lowercased()) }
-    var type: DesignType?  { DesignType(rawValue: length.lowercased()) }
+    var season: Season? { Season(rawValue: occasion.lowercased()) }
+    var designLength: NailLength? { NailLength(rawValue: length.lowercased()) }
+    var type: DesignType? { DesignType(rawValue: designType.lowercased()) }
+    var designMaterial: DesignMaterial? { DesignMaterial(rawValue: material.lowercased()) }
     
     var imageURL: URL? {
         if imagePath.hasPrefix("http") {
@@ -32,6 +35,7 @@ struct NailDesign: Identifiable, Codable {
         let trimmed = base.hasSuffix("/") ? String(base.dropLast()) : base
         return URL(string: "\(trimmed)/uploads/\(imagePath)")
     }
+    
     private enum CodingKeys: String, CodingKey {
         case id, name, description, colors
         case designType, occasion, length, material

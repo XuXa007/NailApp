@@ -26,18 +26,20 @@ class DesignsViewModel: ObservableObject {
         
         filteredDesigns = allDesigns.filter { design in
             let colorMatch = f.selectedColors.isEmpty ||
-                design.colors.contains { color in
-                    f.selectedColors.contains { $0.rawValue.lowercased() == color.lowercased() }
+                design.nailColors.contains { color in
+                    f.selectedColors.contains(color)
                 }
             
             let styleMatch = f.selectedStyles.isEmpty ||
-                f.selectedStyles.contains { $0.rawValue.lowercased() == design.designType.lowercased() }
+                (design.style != nil && f.selectedStyles.contains(design.style!))
             
+
             let seasonMatch = f.selectedSeasons.isEmpty ||
-                f.selectedSeasons.contains { $0.rawValue.lowercased() == design.occasion.lowercased() }
+                (design.season != nil && f.selectedSeasons.contains(design.season!))
             
+
             let typeMatch = f.selectedTypes.isEmpty ||
-                f.selectedTypes.contains { $0.rawValue.lowercased() == design.length.lowercased() }
+                (design.type != nil && f.selectedTypes.contains(design.type!))
             
             return colorMatch && styleMatch && seasonMatch && typeMatch
         }

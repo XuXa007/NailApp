@@ -118,9 +118,32 @@ struct DesignDetailView: View {
         .padding(.horizontal)
     }
 
+    // Обновленный метод для локализации значений
     private func localizedValue(_ value: String) -> String {
-        switch value.lowercased() {
-
+        let lowercased = value.lowercased()
+        
+        
+        if let type = DesignType(rawValue: lowercased) {
+            return type.description
+        }
+        
+        if let style = NailStyle(rawValue: lowercased) {
+            return style.description
+        }
+        
+        if let season = Season(rawValue: lowercased) {
+            return season.description
+        }
+        
+        if let length = NailLength(rawValue: lowercased) {
+            return length.description
+        }
+        
+        if let material = DesignMaterial(rawValue: lowercased) {
+            return material.description
+        }
+        
+        switch lowercased {
         case "french": return "Френч"
         case "ombre": return "Омбре"
         case "matte": return "Матовый"
@@ -146,4 +169,3 @@ struct DesignDetailView: View {
         }
     }
 }
-
