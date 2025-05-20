@@ -177,6 +177,7 @@ struct FilterView: View {
             case .blue: return "Синий"
             case .green: return "Зелёный"
             case .gray: return "Серый"
+            
             }
         } else if let style = item as? NailStyle {
             switch style {

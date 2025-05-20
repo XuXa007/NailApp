@@ -3,3 +3,5 @@ enum DesignType: String, Codable, CaseIterable, Identifiable, CustomStringConver
     var id: String { rawValue }
     var description: String { rawValue.capitalized }
 }
+
+

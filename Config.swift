@@ -63,5 +63,4 @@ struct Config {
         static let designThumbCacheDuration: TimeInterval = 7 * 24 * 60 * 60 // 7 дней
     }
     
-    // Добавляем другие настройки по необходимости
 }
