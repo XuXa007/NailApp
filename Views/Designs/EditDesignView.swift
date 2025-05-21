@@ -45,29 +45,13 @@ struct EditDesignView: View {
                 
                 ScrollView {
                     VStack(spacing: 20) {
-                        if let url = design.imageURL {
-                            AsyncImage(url: url) { phase in
-                                switch phase {
-                                case .empty:
-                                    ProgressView()
-                                case .success(let image):
-                                    image
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(height: 200)
-                                        .cornerRadius(12)
-                                case .failure:
-                                    Image(systemName: "photo")
-                                        .font(.system(size: 40))
-                                        .foregroundColor(.gray)
-                                @unknown default:
-                                    EmptyView()
-                                }
-                            }
+                        // Используем демо-изображение из ViewModel вместо AsyncImage
+                        Image(uiImage: viewModel.imageForDesign(design))
+                            .resizable()
+                            .scaledToFit()
                             .frame(height: 200)
                             .cornerRadius(12)
                             .shadow(radius: 5)
-                        }
                         
                         Group {
                             TextField("Название", text: $name)

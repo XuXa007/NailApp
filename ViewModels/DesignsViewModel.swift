@@ -24,6 +24,14 @@ class DesignsViewModel: ObservableObject {
     func applyLocalFiltering() {
         let f = designFilter
         
+        if f.selectedColors.isEmpty &&
+           f.selectedStyles.isEmpty &&
+           f.selectedSeasons.isEmpty &&
+           f.selectedTypes.isEmpty {
+            filteredDesigns = allDesigns
+            return
+        }
+        
         filteredDesigns = allDesigns.filter { design in
             let colorMatch = f.selectedColors.isEmpty ||
                 design.nailColors.contains { color in
@@ -33,11 +41,9 @@ class DesignsViewModel: ObservableObject {
             let styleMatch = f.selectedStyles.isEmpty ||
                 (design.style != nil && f.selectedStyles.contains(design.style!))
             
-
             let seasonMatch = f.selectedSeasons.isEmpty ||
                 (design.season != nil && f.selectedSeasons.contains(design.season!))
             
-
             let typeMatch = f.selectedTypes.isEmpty ||
                 (design.type != nil && f.selectedTypes.contains(design.type!))
             

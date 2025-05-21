@@ -14,33 +14,33 @@ struct FavoritesView: View {
                 .ignoresSafeArea()
                 
                 VStack {
-                    Text("Избранное")
-                        .font(.largeTitle).bold()
-                        .foregroundColor(.white)
-                        .padding(.top, 16)
+//                    Text("Избранное")
+//                        .font(.largeTitle).bold()
+//                        .foregroundColor(.white)
+//                        .padding(.top, 16)
                     
-                    if favVM.isLoading {
-                        ProgressView()
-                            .padding()
-                    } else if favVM.items.isEmpty {
-                        Text("У вас нет сохранённых дизайнов")
-                            .foregroundColor(.white.opacity(0.7))
-                            .padding()
-                    } else {
-                        ScrollView {
-                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 16)], spacing: 16) {
-                                ForEach(favVM.items) { design in
-                                    NavigationLink {
-                                        DesignDetailView(design: design)
-                                            .environmentObject(favVM)
-                                    } label: {
-                                        DesignCardView(design: design)
-                                    }
-                                }
-                            }
-                            .padding()
-                        }
-                    }
+//                    if favVM.isLoading {
+//                        ProgressView()
+//                            .padding()
+//                    } else if favVM.items.isEmpty {
+//                        Text("У вас нет сохранённых дизайнов")
+//                            .foregroundColor(.white.opacity(0.7))
+//                            .padding()
+//                    } else {
+//                        ScrollView {
+//                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 16)], spacing: 16) {
+//                                ForEach(favVM.items) { design in
+//                                    NavigationLink {
+//                                        DesignDetailView(design: design)
+//                                            .environmentObject(favVM)
+//                                    } label: {
+//                                        DesignCardView(design: design)
+//                                    }
+//                                }
+//                            }
+//                            .padding()
+//                        }
+//                    }
                     
                     Spacer()
                 }
