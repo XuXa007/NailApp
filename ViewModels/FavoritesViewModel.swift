@@ -4,84 +4,153 @@ import SwiftUI
 final class FavoritesViewModel: ObservableObject {
     @Published private(set) var items: [NailDesign] = []
     @Published var isLoading = false
+    @Published var errorMessage: String?
     
-    // Локальное хранилище избранного с использованием UserDefaults
-    private let favoritesKey = "user_favorites"
+    // Кэш избранных для оптимизации
+    private var favoriteIds: Set<String> = []
     
-    // Получение ID избранных дизайнов для пользователя
-    private func getFavoriteIds(for username: String) -> [String] {
-        let defaults = UserDefaults.standard
-        let allFavorites = defaults.dictionary(forKey: favoritesKey) as? [String: [String]] ?? [:]
-        return allFavorites[username] ?? []
+    // Ссылка на основной AuthViewModel
+    private weak var authViewModel: AuthViewModel?
+    
+    // Защита от повторных запросов
+    private var loadingTask: Task<Void, Never>?
+    private var lastLoadedUsername: String?
+    
+    // Метод для установки ссылки на AuthViewModel
+    func setAuthViewModel(_ authVM: AuthViewModel) {
+        self.authViewModel = authVM
     }
     
-    // Сохранение ID избранных дизайнов для пользователя
-    private func saveFavoriteIds(_ ids: [String], for username: String) {
-        let defaults = UserDefaults.standard
-        var allFavorites = defaults.dictionary(forKey: favoritesKey) as? [String: [String]] ?? [:]
-        allFavorites[username] = ids
-        defaults.set(allFavorites, forKey: favoritesKey)
-    }
-    
-    // Загрузка избранного (комбинирует реальные дизайны с локальным списком избранного)
+    // Загрузка избранного с сервера
     func loadFavorites() async {
-        isLoading = true
-        defer { isLoading = false }
-        
-        guard let username = AuthViewModel.shared.user?.username else {
-            items = []
+        guard let user = authViewModel?.user else {
+            print("Пользователь не найден в authViewModel")
+            await MainActor.run {
+                items = []
+                favoriteIds = []
+            }
             return
         }
         
-        do {
-            // Получаем все дизайны с сервера
-            let allDesigns = try await ApiService.shared.fetchDesigns()
-            
-            // Получаем ID избранных дизайнов из локального хранилища
-            let favoriteIds = getFavoriteIds(for: username)
-            
-            // Фильтруем только избранные дизайны
-            items = allDesigns.filter { design in
-                favoriteIds.contains(design.id)
-            }
-        } catch {
-            print("Ошибка загрузки избранного:", error)
-            items = []
+        // Проверяем, не загружаем ли мы уже для этого пользователя
+        if lastLoadedUsername == user.username && isLoading {
+            print("Уже загружаем избранное для \(user.username), пропускаем")
+            return
         }
+        
+        // Отменяем предыдущую задачу если есть
+        loadingTask?.cancel()
+        
+        print("Загружаем избранное для пользователя: \(user.username)")
+        
+        // Создаем новую задачу
+        loadingTask = Task {
+            await MainActor.run {
+                isLoading = true
+                errorMessage = nil
+                lastLoadedUsername = user.username
+            }
+            
+            do {
+                let favorites = try await ApiService.shared.fetchFavorites(username: user.username)
+                
+                // Проверяем, не отменили ли задачу
+                if Task.isCancelled {
+                    print("Задача загрузки избранного отменена")
+                    return
+                }
+                
+                await MainActor.run {
+                    items = favorites
+                    favoriteIds = Set(favorites.map { $0.id })
+                    print("Загружено избранных дизайнов: \(favorites.count)")
+                }
+            } catch {
+                if Task.isCancelled {
+                    print("Задача загрузки избранного отменена")
+                    return
+                }
+                
+                print("Ошибка загрузки избранного:", error)
+                await MainActor.run {
+                    // Не показываем ошибку пользователю, просто оставляем пустой список
+                    items = []
+                    favoriteIds = []
+                }
+            }
+            
+            await MainActor.run {
+                isLoading = false
+            }
+        }
+        
+        await loadingTask?.value
     }
     
     // Добавление/удаление из избранного
     func toggle(_ design: NailDesign) {
-        guard let username = AuthViewModel.shared.user?.username else { return }
-        
-        var favoriteIds = getFavoriteIds(for: username)
-        
-        if favoriteIds.contains(design.id) {
-            // Удаляем из избранного
-            favoriteIds.removeAll { $0 == design.id }
-        } else {
-            // Добавляем в избранное
-            favoriteIds.append(design.id)
+        guard let user = authViewModel?.user else {
+            print("Пользователь не авторизован в toggle")
+            return
         }
         
-        // Сохраняем обновленный список избранного
-        saveFavoriteIds(favoriteIds, for: username)
+        print("Переключаем избранное для дизайна \(design.id), пользователь: \(user.username)")
         
-        // Обновляем список избранного
+        let wasInFavorites = favoriteIds.contains(design.id)
+        
+        // Оптимистичное обновление UI
+        if wasInFavorites {
+            favoriteIds.remove(design.id)
+            items.removeAll { $0.id == design.id }
+        } else {
+            favoriteIds.insert(design.id)
+            if !items.contains(where: { $0.id == design.id }) {
+                items.append(design)
+            }
+        }
+        
+        // Отправляем запрос на сервер
         Task {
-            await loadFavorites()
+            do {
+                if wasInFavorites {
+                    try await ApiService.shared.removeFavorite(id: design.id, username: user.username)
+                    print("Дизайн \(design.id) удален из избранного")
+                } else {
+                    try await ApiService.shared.addFavorite(id: design.id, username: user.username)
+                    print("Дизайн \(design.id) добавлен в избранное")
+                }
+            } catch {
+                print("Ошибка при обновлении избранного:", error)
+                // Откатываем изменения при ошибке
+                await MainActor.run {
+                    if wasInFavorites {
+                        favoriteIds.insert(design.id)
+                        if !items.contains(where: { $0.id == design.id }) {
+                            items.append(design)
+                        }
+                    } else {
+                        favoriteIds.remove(design.id)
+                        items.removeAll { $0.id == design.id }
+                    }
+                }
+            }
         }
     }
     
     // Проверка, находится ли дизайн в избранном
     func isFavorite(_ design: NailDesign) -> Bool {
-        guard let username = AuthViewModel.shared.user?.username else { return false }
-        let favoriteIds = getFavoriteIds(for: username)
+        guard authViewModel?.user != nil else { return false }
         return favoriteIds.contains(design.id)
     }
     
     // Очистка избранного при выходе из аккаунта
     func clearFavorites() {
+        loadingTask?.cancel()
+        loadingTask = nil
+        lastLoadedUsername = nil
         items = []
+        favoriteIds = []
+        errorMessage = nil
+        isLoading = false
     }
 }

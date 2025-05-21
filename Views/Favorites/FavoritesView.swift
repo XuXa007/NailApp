@@ -3,6 +3,7 @@ import SwiftUI
 struct FavoritesView: View {
     @EnvironmentObject var favVM: FavoritesViewModel
     @EnvironmentObject var authVM: AuthViewModel
+    @State private var hasAppeared = false
     
     var body: some View {
         NavigationStack {
@@ -32,9 +33,24 @@ struct FavoritesView: View {
                             .padding()
                     } else if favVM.items.isEmpty {
                         // Empty state
-                        Text("У вас нет сохранённых дизайнов")
-                            .foregroundColor(.white.opacity(0.7))
-                            .padding()
+                        VStack(spacing: 16) {
+                            Image(systemName: "heart")
+                                .font(.system(size: 60))
+                                .foregroundColor(.white.opacity(0.7))
+                            
+                            Text("У вас нет сохранённых дизайнов")
+                                .font(.headline)
+                                .foregroundColor(.white.opacity(0.7))
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
+                            
+                            Text("Добавляйте понравившиеся дизайны в избранное, нажимая на ❤️")
+                                .font(.subheadline)
+                                .foregroundColor(.white.opacity(0.6))
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal)
+                        }
+                        .padding()
                     } else {
                         // Favorites list
                         ScrollView {
@@ -43,6 +59,7 @@ struct FavoritesView: View {
                                     NavigationLink {
                                         DesignDetailView(design: design)
                                             .environmentObject(favVM)
+                                            .environmentObject(authVM)
                                     } label: {
                                         DesignCardView(design: design)
                                     }
@@ -53,14 +70,28 @@ struct FavoritesView: View {
                     }
                 }
             }
-            .task {
-                if authVM.user != nil {
-                    await favVM.loadFavorites()
+            .onAppear {
+                if !hasAppeared {
+                    hasAppeared = true
+                    // Связываем ViewModels при первом появлении экрана
+                    favVM.setAuthViewModel(authVM)
+                    authVM.setFavoritesViewModel(favVM)
+                    
+                    // Загружаем избранное только если пользователь залогинен
+                    if authVM.user != nil {
+                        Task {
+                            await favVM.loadFavorites()
+                        }
+                    }
                 }
             }
-            .onChange(of: authVM.user) { _ in
+            .onChange(of: authVM.user?.id) { _ in
                 Task {
-                    await favVM.loadFavorites()
+                    if authVM.user != nil {
+                        await favVM.loadFavorites()
+                    } else {
+                        favVM.clearFavorites()
+                    }
                 }
             }
         }

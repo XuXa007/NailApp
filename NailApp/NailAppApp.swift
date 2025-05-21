@@ -12,6 +12,10 @@ struct NailAppApp: App {
                 .environmentObject(authVM)
                 .environmentObject(designsVM)
                 .environmentObject(favVM)
+                .onAppear {
+                    // Связываем FavoritesViewModel с AuthViewModel
+                    favVM.setAuthViewModel(authVM)
+                }
         }
     }
 }

@@ -7,6 +7,14 @@ class AuthViewModel: ObservableObject {
     @Published var user: UserProfile? = nil
     @Published var isLoading = false
     
+    // Ссылка на FavoritesViewModel для очистки избранного
+    private weak var favoritesViewModel: FavoritesViewModel?
+    
+    // Метод для установки ссылки на FavoritesViewModel
+    func setFavoritesViewModel(_ favVM: FavoritesViewModel) {
+        self.favoritesViewModel = favVM
+    }
+    
     // Демо-вход для клиента
     func loginAsClient() {
         user = UserProfile(
@@ -15,6 +23,7 @@ class AuthViewModel: ObservableObject {
             email: "client@example.com",
             role: .client
         )
+        print("Выполнен вход как клиент: \(user?.username ?? "unknown")")
     }
     
     // Демо-вход для мастера
@@ -27,10 +36,14 @@ class AuthViewModel: ObservableObject {
             salonName: "Студия Nail Art",
             address: "ул. Пушкина, д. 10"
         )
+        print("Выполнен вход как мастер: \(user?.username ?? "unknown")")
     }
     
     func logout() {
         user = nil
+        // Очищаем избранное при выходе
+        favoritesViewModel?.clearFavorites()
+        print("Выполнен выход из аккаунта")
     }
     
     // Имитация входа

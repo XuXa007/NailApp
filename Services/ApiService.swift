@@ -88,19 +88,22 @@ class ApiService {
     }
     
     func fetchFavorites() async throws -> [NailDesign] {
-        let url = baseURL.appendingPathComponent("/api/auth/favorites")
+        let url = baseURL.appendingPathComponent("api/auth/favorites")
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
+        
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, 200..<300 ~= http.statusCode else {
             throw ApiError.badResponse
         }
-        return try JSONDecoder().decode([NailDesign].self, from: data)
+        
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return try decoder.decode([NailDesign].self, from: data)
     }
     
-    
     func addFavorite(id: String) async throws {
-        let url = baseURL.appendingPathComponent("/api/auth/favorites/\(id)")
+        let url = baseURL.appendingPathComponent("api/auth/favorites/\(id)")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         
@@ -111,7 +114,7 @@ class ApiService {
     }
     
     func removeFavorite(id: String) async throws {
-        let url = baseURL.appendingPathComponent("/api/auth/favorites/\(id)")
+        let url = baseURL.appendingPathComponent("api/auth/favorites/\(id)")
         var request = URLRequest(url: url)
         request.httpMethod = "DELETE"
         
@@ -120,7 +123,6 @@ class ApiService {
             throw ApiError.badResponse
         }
     }
-    
     
     func fetchDesigns(using filter: DesignFilter? = nil) async throws -> [NailDesign] {
         if filter == nil ||
@@ -190,7 +192,6 @@ class ApiService {
         return try decoder.decode([NailDesign].self, from: data)
     }
     
-    
     func registerMaster(username: String, email: String, password: String,
                         salonName: String, address: String) async throws -> UserProfile {
         let url = baseURL.appendingPathComponent("/api/auth/register/master")
@@ -213,7 +214,6 @@ class ApiService {
         
         return try JSONDecoder().decode(UserProfile.self, from: data)
     }
-    
     
     func getMasterDesigns(username: String) async throws -> [NailDesign] {
         let url = baseURL.appendingPathComponent("/api/master/designs/my")
@@ -286,66 +286,131 @@ class ApiService {
         return try JSONDecoder().decode(NailDesign.self, from: data)
     }
         
-        
-        func updateDesign(design: NailDesign, username: String) async throws -> NailDesign {
-            guard let url = URL(string: "\(baseURL)/api/master/designs/\(design.id)") else {
-                throw ApiError.urlError
-            }
-            
-            var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
-            components?.queryItems = [URLQueryItem(name: "username", value: username)]
-            
-            guard let requestURL = components?.url else {
-                throw ApiError.urlError
-            }
-            
-            var request = URLRequest(url: requestURL)
-            request.httpMethod = "PUT"
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            
-            // Кодируем дизайн в JSON
-            let encoder = JSONEncoder()
-            request.httpBody = try encoder.encode(design)
-            
-            let (data, response) = try await URLSession.shared.data(for: request)
-            
-            guard let httpResponse = response as? HTTPURLResponse,
-                  200..<300 ~= httpResponse.statusCode else {
-                throw ApiError.badResponse
-            }
-            
-            // Декодируем и возвращаем обновленный дизайн
-            let decoder = JSONDecoder()
-            return try decoder.decode(NailDesign.self, from: data)
+    func updateDesign(design: NailDesign, username: String) async throws -> NailDesign {
+        guard let url = URL(string: "\(baseURL)/api/master/designs/\(design.id)") else {
+            throw ApiError.urlError
         }
         
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
+        components?.queryItems = [URLQueryItem(name: "username", value: username)]
         
+        guard let requestURL = components?.url else {
+            throw ApiError.urlError
+        }
         
+        var request = URLRequest(url: requestURL)
+        request.httpMethod = "PUT"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        func deleteDesign(id: String, username: String) async throws {
-             guard let url = URL(string: "\(baseURL)/api/master/designs/\(id)") else {
-                 throw ApiError.urlError
-             }
-             
-             var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
-             components?.queryItems = [URLQueryItem(name: "username", value: username)]
-             
-             guard let requestURL = components?.url else {
-                 throw ApiError.urlError
-             }
-             
-             var request = URLRequest(url: requestURL)
-             request.httpMethod = "DELETE"
-             
-             let (_, response) = try await URLSession.shared.data(for: request)
-             
-             guard let httpResponse = response as? HTTPURLResponse,
-                   200..<300 ~= httpResponse.statusCode else {
-                 throw ApiError.badResponse
-             }
+        // Кодируем дизайн в JSON
+        let encoder = JSONEncoder()
+        request.httpBody = try encoder.encode(design)
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              200..<300 ~= httpResponse.statusCode else {
+            throw ApiError.badResponse
+        }
+        
+        // Декодируем и возвращаем обновленный дизайн
+        let decoder = JSONDecoder()
+        return try decoder.decode(NailDesign.self, from: data)
+    }
+    
+    func deleteDesign(id: String, username: String) async throws {
+         guard let url = URL(string: "\(baseURL)/api/master/designs/\(id)") else {
+             throw ApiError.urlError
+         }
+         
+         var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
+         components?.queryItems = [URLQueryItem(name: "username", value: username)]
+         
+         guard let requestURL = components?.url else {
+             throw ApiError.urlError
+         }
+         
+         var request = URLRequest(url: requestURL)
+         request.httpMethod = "DELETE"
+         
+         let (_, response) = try await URLSession.shared.data(for: request)
+         
+         guard let httpResponse = response as? HTTPURLResponse,
+               200..<300 ~= httpResponse.statusCode else {
+             throw ApiError.badResponse
          }
      }
     
+    func fetchFavorites(username: String = "demo_client") async throws -> [NailDesign] {
+        var components = URLComponents(url: baseURL.appendingPathComponent("api/auth/favorites"), resolvingAgainstBaseURL: true)
+        components?.queryItems = [URLQueryItem(name: "username", value: username)]
+        
+        guard let url = components?.url else {
+            throw ApiError.urlError
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        print("[ApiService] GET \(url.absoluteString)")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
+            throw ApiError.badResponse
+        }
+        
+        print("[ApiService] Favorites response status: \(http.statusCode)")
+        
+        if !(200..<300).contains(http.statusCode) {
+            let body = String(data: data, encoding: .utf8) ?? "<empty body>"
+            print("[ApiService] Favorites error response: \(body)")
+            throw ApiError.badResponse
+        }
+        
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return try decoder.decode([NailDesign].self, from: data)
+    }
+
+    func addFavorite(id: String, username: String = "demo_client") async throws {
+        var components = URLComponents(url: baseURL.appendingPathComponent("api/auth/favorites/\(id)"), resolvingAgainstBaseURL: true)
+        components?.queryItems = [URLQueryItem(name: "username", value: username)]
+        
+        guard let url = components?.url else {
+            throw ApiError.urlError
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        
+        print("[ApiService] POST \(url.absoluteString)")
+        
+        let (_, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse, 200..<300 ~= http.statusCode else {
+            throw ApiError.badResponse
+        }
+    }
+
+    func removeFavorite(id: String, username: String = "demo_client") async throws {
+        var components = URLComponents(url: baseURL.appendingPathComponent("api/auth/favorites/\(id)"), resolvingAgainstBaseURL: true)
+        components?.queryItems = [URLQueryItem(name: "username", value: username)]
+        
+        guard let url = components?.url else {
+            throw ApiError.urlError
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "DELETE"
+        
+        print("[ApiService] DELETE \(url.absoluteString)")
+        
+        let (_, response) = try await URLSession.shared.data(for: request)
+        guard let http = response as? HTTPURLResponse, 200..<300 ~= http.statusCode else {
+            throw ApiError.badResponse
+        }
+    }
+}
+
 extension Data {
     mutating func append(_ string: String) {
         if let data = string.data(using: .utf8) {

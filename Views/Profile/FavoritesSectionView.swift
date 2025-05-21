@@ -6,46 +6,6 @@ struct FavoritesSectionView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Избранное")
-                .font(.headline)
-                .foregroundColor(.white)
-                .padding(.horizontal)
-            
-            if authVM.user == nil {
-                Text("Войдите, чтобы увидеть избранное")
-                    .font(.subheadline)
-                    .foregroundColor(.white.opacity(0.7))
-                    .padding(.horizontal)
-            } else if favVM.isLoading {
-                ProgressView().padding()
-            } else if favVM.items.isEmpty {
-                Text("Нет сохранённых дизайнов")
-                    .foregroundColor(.white.opacity(0.7))
-                    .padding(.horizontal)
-            } else {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        ForEach(favVM.items.prefix(5)) { design in
-                            NavigationLink {
-                                DesignDetailView(design: design)
-                                    .environmentObject(favVM)
-                            } label: {
-                                favoriteDesignCard(design)
-                            }
-                        }
-                        
-                        if favVM.items.count > 5 {
-                            NavigationLink {
-                                FavoritesView()
-                                    .environmentObject(favVM)
-                            } label: {
-                                showMoreCard(count: favVM.items.count - 5)
-                            }
-                        }
-                    }
-                    .padding(.horizontal)
-                }
-            }
         }
         .task {
             if authVM.user != nil {
