@@ -79,4 +79,9 @@ final class FavoritesViewModel: ObservableObject {
         let favoriteIds = getFavoriteIds(for: username)
         return favoriteIds.contains(design.id)
     }
+    
+    // Очистка избранного при выходе из аккаунта
+    func clearFavorites() {
+        items = []
+    }
 }

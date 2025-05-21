@@ -1,6 +1,6 @@
 import Foundation
 
-struct UserProfile: Codable {
+struct UserProfile: Codable, Equatable {
     let id: String
     let username: String
     let email: String
@@ -19,5 +19,14 @@ struct UserProfile: Codable {
     
     var isMaster: Bool {
         return role == .master
+    }
+    
+    static func == (lhs: UserProfile, rhs: UserProfile) -> Bool {
+        return lhs.id == rhs.id &&
+               lhs.username == rhs.username &&
+               lhs.email == rhs.email &&
+               lhs.role == rhs.role &&
+               lhs.salonName == rhs.salonName &&
+               lhs.address == rhs.address
     }
 }

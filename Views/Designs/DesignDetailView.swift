@@ -3,7 +3,9 @@ import SwiftUI
 struct DesignDetailView: View {
     let design: NailDesign
     @EnvironmentObject var favVM: FavoritesViewModel
+    @EnvironmentObject var authVM: AuthViewModel
     @Environment(\.dismiss) var dismiss
+    @State private var showLoginSheet = false
     
     var body: some View {
         ZStack {
@@ -43,7 +45,11 @@ struct DesignDetailView: View {
                     
                     HStack(spacing: 16) {
                         Button {
-                            favVM.toggle(design)
+                            if authVM.user != nil {
+                                favVM.toggle(design)
+                            } else {
+                                showLoginSheet = true
+                            }
                         } label: {
                             Label(
                                 favVM.isFavorite(design) ? "Удалить" : "В избранное",
@@ -80,6 +86,9 @@ struct DesignDetailView: View {
                         .clipShape(Circle())
                 }
             }
+        }
+        .sheet(isPresented: $showLoginSheet) {
+            LoginView().environmentObject(authVM)
         }
     }
     
