@@ -121,16 +121,16 @@ class ApiService {
         }
     }
     
-
+    
     func fetchDesigns(using filter: DesignFilter? = nil) async throws -> [NailDesign] {
         if filter == nil ||
-           (filter!.selectedColors.isEmpty &&
-            filter!.selectedStyles.isEmpty &&
-            filter!.selectedSeasons.isEmpty &&
-            filter!.selectedTypes.isEmpty) {
+            (filter!.selectedColors.isEmpty &&
+             filter!.selectedStyles.isEmpty &&
+             filter!.selectedSeasons.isEmpty &&
+             filter!.selectedTypes.isEmpty) {
             
             let comps = URLComponents(url: baseURL.appendingPathComponent("api/designs"),
-                                    resolvingAgainstBaseURL: false)
+                                      resolvingAgainstBaseURL: false)
             guard let url = comps?.url else {
                 throw ApiError.urlError
             }
@@ -156,7 +156,7 @@ class ApiService {
             return try await fetchDesignsWithFilter(filter!)
         }
     }
-
+    
     private func fetchDesignsWithFilter(_ filter: DesignFilter) async throws -> [NailDesign] {
         let url = baseURL.appendingPathComponent("api/designs/filter")
         var request = URLRequest(url: url)
@@ -190,4 +190,166 @@ class ApiService {
         return try decoder.decode([NailDesign].self, from: data)
     }
     
+    
+    func registerMaster(username: String, email: String, password: String,
+                        salonName: String, address: String) async throws -> UserProfile {
+        let url = baseURL.appendingPathComponent("/api/auth/register/master")
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let body = [
+            "username": username,
+            "email": email,
+            "password": password,
+            "salonName": salonName,
+            "address": address
+        ]
+        req.httpBody = try JSONEncoder().encode(body)
+        
+        let (data, resp) = try await URLSession.shared.data(for: req)
+        guard let http = resp as? HTTPURLResponse, 200..<300 ~= http.statusCode
+        else { throw ApiError.badResponse }
+        
+        return try JSONDecoder().decode(UserProfile.self, from: data)
+    }
+    
+    
+    func getMasterDesigns(username: String) async throws -> [NailDesign] {
+        let url = baseURL.appendingPathComponent("/api/master/designs/my")
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
+        components?.queryItems = [URLQueryItem(name: "username", value: username)]
+        
+        guard let requestURL = components?.url else {
+            throw ApiError.urlError
+        }
+        
+        var request = URLRequest(url: requestURL)
+        request.httpMethod = "GET"
+        
+        let (data, resp) = try await URLSession.shared.data(for: request)
+        guard let http = resp as? HTTPURLResponse, 200..<300 ~= http.statusCode
+        else { throw ApiError.badResponse }
+        
+        return try JSONDecoder().decode([NailDesign].self, from: data)
+    }
+    
+    func uploadDesign(name: String, description: String,
+                     designType: String, color: String,
+                     occasion: String, length: String,
+                     material: String, image: Data,
+                     username: String) async throws -> NailDesign {
+        let url = baseURL.appendingPathComponent("/api/master/designs")
+        
+        // Создаем multipart/form-data запрос
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        
+        let boundary = "Boundary-\(UUID().uuidString)"
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        
+        var body = Data()
+        
+        // Добавляем текстовые поля
+        let fields = [
+            "name": name,
+            "description": description,
+            "designType": designType,
+            "color": color,
+            "occasion": occasion,
+            "length": length,
+            "material": material,
+            "username": username
+        ]
+        
+        for (key, value) in fields {
+            body.append("--\(boundary)\r\n")
+            body.append("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n")
+            body.append("\(value)\r\n")
+        }
+        
+        // Добавляем изображение
+        body.append("--\(boundary)\r\n")
+        body.append("Content-Disposition: form-data; name=\"image\"; filename=\"design.jpg\"\r\n")
+        body.append("Content-Type: image/jpeg\r\n\r\n")
+        body.append(image)
+        body.append("\r\n")
+        
+        body.append("--\(boundary)--\r\n")
+        
+        request.httpBody = body
+        
+        let (data, resp) = try await URLSession.shared.data(for: request)
+        guard let http = resp as? HTTPURLResponse, 200..<300 ~= http.statusCode
+        else { throw ApiError.badResponse }
+        
+        return try JSONDecoder().decode(NailDesign.self, from: data)
+    }
+        
+        
+        func updateDesign(design: NailDesign, username: String) async throws -> NailDesign {
+            guard let url = URL(string: "\(baseURL)/api/master/designs/\(design.id)") else {
+                throw ApiError.urlError
+            }
+            
+            var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
+            components?.queryItems = [URLQueryItem(name: "username", value: username)]
+            
+            guard let requestURL = components?.url else {
+                throw ApiError.urlError
+            }
+            
+            var request = URLRequest(url: requestURL)
+            request.httpMethod = "PUT"
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            
+            // Кодируем дизайн в JSON
+            let encoder = JSONEncoder()
+            request.httpBody = try encoder.encode(design)
+            
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse,
+                  200..<300 ~= httpResponse.statusCode else {
+                throw ApiError.badResponse
+            }
+            
+            // Декодируем и возвращаем обновленный дизайн
+            let decoder = JSONDecoder()
+            return try decoder.decode(NailDesign.self, from: data)
+        }
+        
+        
+        
+        
+        func deleteDesign(id: String, username: String) async throws {
+             guard let url = URL(string: "\(baseURL)/api/master/designs/\(id)") else {
+                 throw ApiError.urlError
+             }
+             
+             var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
+             components?.queryItems = [URLQueryItem(name: "username", value: username)]
+             
+             guard let requestURL = components?.url else {
+                 throw ApiError.urlError
+             }
+             
+             var request = URLRequest(url: requestURL)
+             request.httpMethod = "DELETE"
+             
+             let (_, response) = try await URLSession.shared.data(for: request)
+             
+             guard let httpResponse = response as? HTTPURLResponse,
+                   200..<300 ~= httpResponse.statusCode else {
+                 throw ApiError.badResponse
+             }
+         }
+     }
+    
+extension Data {
+    mutating func append(_ string: String) {
+        if let data = string.data(using: .utf8) {
+            self.append(data)
+        }
+    }
 }

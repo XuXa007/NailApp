@@ -1,7 +1,6 @@
 import SwiftUI
 import Combine
 
-// Переименован класс, чтобы избежать конфликта с существующим ARViewModel
 class ARTryOnViewModel: NSObject, ObservableObject {
     @Published var resultImage: UIImage?
     @Published var isLoading: Bool = false
@@ -81,7 +80,6 @@ struct ARTryOnView: View {
     // Дизайн передается при создании компонента
     let design: NailDesign
     
-    // Заменен тип ViewModel на ARTryOnViewModel
     @StateObject private var vm = ARTryOnViewModel()
     @State private var inputImage: UIImage?
     @State private var showPicker = false

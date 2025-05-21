@@ -12,10 +12,21 @@ class AuthViewModel: ObservableObject {
         catch { print(error) }
     }
     
-    func register(username: String, email: String, password: String) async {
+    func registerClient(username: String, email: String, password: String) async {
         isLoading = true
         defer { isLoading = false }
-        do { user = try await AuthService.shared.register(username: username, email: email, password: password) }
+        do {
+            user = try await AuthService.shared.registerClient(username: username, email: email, password: password)
+        }
+        catch { print(error) }
+    }
+    
+    func registerMaster(username: String, email: String, password: String, salonName: String, address: String) async {
+        isLoading = true
+        defer { isLoading = false }
+        do {
+            user = try await AuthService.shared.registerMaster(username: username, email: email, password: password, salonName: salonName, address: address)
+        }
         catch { print(error) }
     }
     

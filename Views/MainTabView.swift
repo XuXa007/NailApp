@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct MainTabView: View {
-    @StateObject private var designsVM = DesignsViewModel()
     @StateObject private var authVM = AuthViewModel()
+    @StateObject private var designsVM = DesignsViewModel()
     @StateObject private var favVM = FavoritesViewModel()
     
     init() {
@@ -20,6 +20,7 @@ struct MainTabView: View {
     
     var body: some View {
         TabView {
+            // Каталог дизайнов (доступен всем)
             NavigationStack {
                 DesignsView()
                     .environmentObject(designsVM)
@@ -29,6 +30,28 @@ struct MainTabView: View {
                 Label("Каталог", systemImage: "square.grid.2x2.fill")
             }
             
+            // Избранное (для всех пользователей)
+            NavigationStack {
+                FavoritesView()
+                    .environmentObject(favVM)
+            }
+            .tabItem {
+                Label("Избранное", systemImage: "heart.fill")
+            }
+            
+            if let user = authVM.user, user.role == .master {
+                NavigationStack {
+                    MasterDashboardView()
+                        .environmentObject(authVM)
+                }
+                .tabItem {
+                    Label("Мои дизайны", systemImage: "plus.app.fill")
+                }
+            }
+            
+
+            
+            // Профиль пользователя (для всех)
             NavigationStack {
                 ProfileView()
                     .environmentObject(authVM)
@@ -38,22 +61,6 @@ struct MainTabView: View {
                 Label("Профиль", systemImage: "person.crop.circle.fill")
             }
         }
-    }
-}
-
-private extension UIImage {
-    static func gradientImage(colors: [UIColor], size: CGSize) -> UIImage {
-        let renderer = UIGraphicsImageRenderer(size: size)
-        return renderer.image { ctx in
-            let cgColors = colors.map { $0.cgColor } as CFArray
-            let space = CGColorSpaceCreateDeviceRGB()
-            let grad = CGGradient(colorsSpace: space, colors: cgColors, locations: [0,1])!
-            ctx.cgContext.drawLinearGradient(
-                grad,
-                start: .zero,
-                end: CGPoint(x: size.width, y: 0),
-                options: []
-            )
-        }
+        .environmentObject(authVM)
     }
 }

@@ -11,6 +11,8 @@ struct NailDesign: Identifiable, Codable {
     let material: String
     let imagePath: String
     let thumbnailPath: String
+    let createdBy: String?
+    let salonName: String?
     
     var nailColors: [NailColor] {
         colors.compactMap { NailColor(rawValue: $0.lowercased()) }
@@ -40,6 +42,7 @@ struct NailDesign: Identifiable, Codable {
         case id, name, description, colors
         case designType, occasion, length, material
         case imagePath, thumbnailPath
+        case createdBy, salonName
     }
     
     init(from decoder: Decoder) throws {
@@ -54,6 +57,25 @@ struct NailDesign: Identifiable, Codable {
         material      = try c.decode(String.self, forKey: .material)
         imagePath     = try c.decode(String.self, forKey: .imagePath)
         thumbnailPath = try c.decode(String.self, forKey: .thumbnailPath)
+        createdBy     = try c.decodeIfPresent(String.self, forKey: .createdBy)
+        salonName     = try c.decodeIfPresent(String.self, forKey: .salonName)
+    }
+    
+    init(id: String, name: String, description: String, colors: [String],
+         designType: String, occasion: String, length: String, material: String,
+         imagePath: String, thumbnailPath: String, createdBy: String? = nil, salonName: String? = nil) {
+        self.id = id
+        self.name = name
+        self.description = description
+        self.colors = colors
+        self.designType = designType
+        self.occasion = occasion
+        self.length = length
+        self.material = material
+        self.imagePath = imagePath
+        self.thumbnailPath = thumbnailPath
+        self.createdBy = createdBy
+        self.salonName = salonName
     }
     
     func encode(to encoder: Encoder) throws {

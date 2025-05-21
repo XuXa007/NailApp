@@ -57,7 +57,6 @@ struct HandShapeOverlayView: View {
                     .frame(width: geometry.size.width * 0.7, height: geometry.size.height * 0.7)
                     .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
                 
-                // Надпись с инструкцией
                 VStack {
                     Text("Расположите руку в контуре")
                         .font(.headline)

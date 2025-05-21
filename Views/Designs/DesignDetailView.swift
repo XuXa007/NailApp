@@ -46,7 +46,7 @@ struct DesignDetailView: View {
                             favVM.toggle(design)
                         } label: {
                             Label(
-                                favVM.isFavorite(design) ? "Убрать из избранного" : "В избранное",
+                                favVM.isFavorite(design) ? "Удалить" : "В избранное",
                                 systemImage: favVM.isFavorite(design) ? "heart.fill" : "heart"
                             )
                         }

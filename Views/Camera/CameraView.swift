@@ -25,7 +25,6 @@ struct CameraView: View {
                 
                 // Увеличиваем размер предпросмотра камеры
                 ZStack {
-                    // Исправленное превью камеры
                     CameraPreviewView(session: viewModel.session)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .cornerRadius(12)
@@ -35,7 +34,7 @@ struct CameraView: View {
                         )
                         .padding(.horizontal, 20)
                     
-                    // Добавляем ваш контур руки
+                    // Добавляем контур руки
                     HandImageOverlayView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .padding(.horizontal, 20)

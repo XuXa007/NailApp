@@ -8,6 +8,17 @@
 
 /* Begin PBXBuildFile section */
 		C92F2D8F2DD7B31000FC6ADA /* HandImageOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C92F2D8E2DD7B30F00FC6ADA /* HandImageOverlayView.swift */; };
+		C93009B42DDE16C70077C63E /* UserRole.swift in Sources */ = {isa = PBXBuildFile; fileRef = C93009B32DDE16C60077C63E /* UserRole.swift */; };
+		C93009B62DDE1AE70077C63E /* DesignsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C93009B52DDE1AE50077C63E /* DesignsService.swift */; };
+		C93009BA2DDE1BE00077C63E /* DesignEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C93009B92DDE1BDD0077C63E /* DesignEditorView.swift */; };
+		C93009BE2DDE48F70077C63E /* MasterDesignsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C93009BD2DDE48F50077C63E /* MasterDesignsViewModel.swift */; };
+		C93009C02DDE491D0077C63E /* MasterDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C93009BF2DDE49140077C63E /* MasterDashboardView.swift */; };
+		C93009C22DDE49500077C63E /* AddDesignView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C93009C12DDE494D0077C63E /* AddDesignView.swift */; };
+		C93009C42DDE496C0077C63E /* EditDesignView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C93009C32DDE49670077C63E /* EditDesignView.swift */; };
+		C93009C62DDE49950077C63E /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = C93009C52DDE49940077C63E /* ImagePicker.swift */; };
+		C93009C82DDE4A520077C63E /* TryOnCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C93009C72DDE4A510077C63E /* TryOnCameraView.swift */; };
+		C93009CA2DDE4A650077C63E /* DesignPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C93009C92DDE4A640077C63E /* DesignPickerView.swift */; };
+		C93009CC2DDE4E220077C63E /* UIImage+Gradient.swift in Sources */ = {isa = PBXBuildFile; fileRef = C93009CB2DDE4E1F0077C63E /* UIImage+Gradient.swift */; };
 		C9404CE22DDA240C001382F2 /* CacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9404CE12DDA240B001382F2 /* CacheManager.swift */; };
 		C971F21D2DDCE6230039BBDF /* NailLength.swift in Sources */ = {isa = PBXBuildFile; fileRef = C971F21C2DDCE6210039BBDF /* NailLength.swift */; };
 		C971F2202DDCE7500039BBDF /* DesignMaterial.swift in Sources */ = {isa = PBXBuildFile; fileRef = C971F21F2DDCE7500039BBDF /* DesignMaterial.swift */; };
@@ -73,6 +84,17 @@
 
 /* Begin PBXFileReference section */
 		C92F2D8E2DD7B30F00FC6ADA /* HandImageOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandImageOverlayView.swift; sourceTree = "<group>"; };
+		C93009B32DDE16C60077C63E /* UserRole.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserRole.swift; sourceTree = "<group>"; };
+		C93009B52DDE1AE50077C63E /* DesignsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignsService.swift; sourceTree = "<group>"; };
+		C93009B92DDE1BDD0077C63E /* DesignEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignEditorView.swift; sourceTree = "<group>"; };
+		C93009BD2DDE48F50077C63E /* MasterDesignsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterDesignsViewModel.swift; sourceTree = "<group>"; };
+		C93009BF2DDE49140077C63E /* MasterDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterDashboardView.swift; sourceTree = "<group>"; };
+		C93009C12DDE494D0077C63E /* AddDesignView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddDesignView.swift; sourceTree = "<group>"; };
+		C93009C32DDE49670077C63E /* EditDesignView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditDesignView.swift; sourceTree = "<group>"; };
+		C93009C52DDE49940077C63E /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
+		C93009C72DDE4A510077C63E /* TryOnCameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TryOnCameraView.swift; sourceTree = "<group>"; };
+		C93009C92DDE4A640077C63E /* DesignPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignPickerView.swift; sourceTree = "<group>"; };
+		C93009CB2DDE4E1F0077C63E /* UIImage+Gradient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Gradient.swift"; sourceTree = "<group>"; };
 		C9404CE12DDA240B001382F2 /* CacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheManager.swift; sourceTree = "<group>"; };
 		C971F21C2DDCE6210039BBDF /* NailLength.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NailLength.swift; sourceTree = "<group>"; };
 		C971F21F2DDCE7500039BBDF /* DesignMaterial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignMaterial.swift; sourceTree = "<group>"; };
@@ -226,6 +248,7 @@
 		C9CA6AA72DCF7A8F00CF8BF1 /* Profile */ = {
 			isa = PBXGroup;
 			children = (
+				C93009BF2DDE49140077C63E /* MasterDashboardView.swift */,
 				C9BB963A2DD0BA6000E718CC /* FavoritesSectionView.swift */,
 				C9CA6AAC2DCF7AA100CF8BF1 /* RegisterView.swift */,
 				C9CA6AAA2DCF7A9C00CF8BF1 /* LoginView.swift */,
@@ -237,6 +260,7 @@
 		C9CA6AAF2DCF7AB000CF8BF1 /* AR */ = {
 			isa = PBXGroup;
 			children = (
+				C93009C72DDE4A510077C63E /* TryOnCameraView.swift */,
 				C9B9858F2DD763910026673F /* CameraPreviewView.swift */,
 				C9CA6AB02DCF7AB700CF8BF1 /* ARTryOnView.swift */,
 			);
@@ -246,6 +270,7 @@
 		C9CA6AB42DCF7AC800CF8BF1 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				C93009BD2DDE48F50077C63E /* MasterDesignsViewModel.swift */,
 				C9B9858B2DD763630026673F /* CameraViewModel.swift */,
 				C9CA6AB92DCF7B2300CF8BF1 /* FilterViewModel.swift */,
 				C9CA6AB82DCF7AF600CF8BF1 /* ARViewModel.swift */,
@@ -259,6 +284,8 @@
 		C9CA6ABC2DCF7B4200CF8BF1 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				C93009CB2DDE4E1F0077C63E /* UIImage+Gradient.swift */,
+				C93009C52DDE49940077C63E /* ImagePicker.swift */,
 				C9404CE12DDA240B001382F2 /* CacheManager.swift */,
 				C9BB96382DD0B7A600E718CC /* ProfileActionButtonStyle.swift */,
 				C9BB96342DD0B60B00E718CC /* ColorChip.swift */,
@@ -284,6 +311,7 @@
 		C9F5630B2DCEAFE700706027 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				C93009B32DDE16C60077C63E /* UserRole.swift */,
 				C971F2212DDCE7680039BBDF /* DesignLength.swift */,
 				C971F21F2DDCE7500039BBDF /* DesignMaterial.swift */,
 				C971F21C2DDCE6210039BBDF /* NailLength.swift */,
@@ -301,6 +329,7 @@
 		C9F5630F2DCEB00E00706027 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				C93009B52DDE1AE50077C63E /* DesignsService.swift */,
 				C9CA6ABA2DCF7B3500CF8BF1 /* AuthService.swift */,
 				C9F563112DCEB01B00706027 /* ARImageProcessor.swift */,
 				C9F563102DCEB01500706027 /* ApiService.swift */,
@@ -324,6 +353,10 @@
 		C9F5631B2DCEB06100706027 /* Designs */ = {
 			isa = PBXGroup;
 			children = (
+				C93009C92DDE4A640077C63E /* DesignPickerView.swift */,
+				C93009C32DDE49670077C63E /* EditDesignView.swift */,
+				C93009C12DDE494D0077C63E /* AddDesignView.swift */,
+				C93009B92DDE1BDD0077C63E /* DesignEditorView.swift */,
 				C9F5631E2DCEB07300706027 /* FilterView.swift */,
 				C9F5631D2DCEB06B00706027 /* DesignDetailView.swift */,
 				C9F5631C2DCEB06500706027 /* DesignsView.swift */,
@@ -482,11 +515,14 @@
 				C9F563342DCEB23300706027 /* DesignFilters.swift in Sources */,
 				C92F2D8F2DD7B31000FC6ADA /* HandImageOverlayView.swift in Sources */,
 				C9BB96352DD0B60C00E718CC /* ColorChip.swift in Sources */,
+				C93009C62DDE49950077C63E /* ImagePicker.swift in Sources */,
 				C9CA6AC62DCF7D9000CF8BF1 /* ARViewModel.swift in Sources */,
 				C971F2222DDCE7690039BBDF /* DesignLength.swift in Sources */,
 				C9CA6ABB2DCF7B3600CF8BF1 /* AuthService.swift in Sources */,
+				C93009C02DDE491D0077C63E /* MasterDashboardView.swift in Sources */,
 				C9CA6AA32DCF7A0E00CF8BF1 /* MainTabView.swift in Sources */,
 				C9F5632B2DCEB20300706027 /* DesignsView.swift in Sources */,
+				C93009C82DDE4A520077C63E /* TryOnCameraView.swift in Sources */,
 				C9F563362DCEB23B00706027 /* NailDesign.swift in Sources */,
 				C9CA6AC12DCF7D7B00CF8BF1 /* Extensions.swift in Sources */,
 				C9CA6AB12DCF7AB800CF8BF1 /* ARTryOnView.swift in Sources */,
@@ -494,8 +530,10 @@
 				C9CA6AAD2DCF7AA100CF8BF1 /* RegisterView.swift in Sources */,
 				C9CA6AC42DCF7D8700CF8BF1 /* DesignCardView.swift in Sources */,
 				C9CA6AC82DCF7D9800CF8BF1 /* FavoritesViewModel.swift in Sources */,
+				C93009CA2DDE4A650077C63E /* DesignPickerView.swift in Sources */,
 				C971F2202DDCE7500039BBDF /* DesignMaterial.swift in Sources */,
 				C9F563322DCEB22C00706027 /* ARImageProcessor.swift in Sources */,
+				C93009BE2DDE48F70077C63E /* MasterDesignsViewModel.swift in Sources */,
 				C9F5632A2DCEB1FF00706027 /* DesignDetailView.swift in Sources */,
 				C9CA6AAB2DCF7A9C00CF8BF1 /* LoginView.swift in Sources */,
 				C9BB96332DD0B5C900E718CC /* InfoRow.swift in Sources */,
@@ -504,6 +542,8 @@
 				C9B9858E2DD7636E0026673F /* CameraView.swift in Sources */,
 				C9BB962F2DD0B26000E718CC /* ActionButtonStyle.swift in Sources */,
 				C9404CE22DDA240C001382F2 /* CacheManager.swift in Sources */,
+				C93009BA2DDE1BE00077C63E /* DesignEditorView.swift in Sources */,
+				C93009C42DDE496C0077C63E /* EditDesignView.swift in Sources */,
 				C9CA6AC22DCF7D7F00CF8BF1 /* LoadingView.swift in Sources */,
 				C9CA6AD52DCF87C500CF8BF1 /* DesignType.swift in Sources */,
 				C9CA6AC52DCF7D8C00CF8BF1 /* FilterViewModel.swift in Sources */,
@@ -515,10 +555,14 @@
 				C9CA6AC72DCF7D9400CF8BF1 /* AuthViewModel.swift in Sources */,
 				C9CA6AC32DCF7D8300CF8BF1 /* FeatureCardView.swift in Sources */,
 				C971F21D2DDCE6230039BBDF /* NailLength.swift in Sources */,
+				C93009CC2DDE4E220077C63E /* UIImage+Gradient.swift in Sources */,
+				C93009B42DDE16C70077C63E /* UserRole.swift in Sources */,
+				C93009C22DDE49500077C63E /* AddDesignView.swift in Sources */,
 				C9BB96392DD0B7A700E718CC /* ProfileActionButtonStyle.swift in Sources */,
 				C9B985922DD764260026673F /* HandDetectionManager.swift in Sources */,
 				C9CA6AB32DCF7AC300CF8BF1 /* ImagePickerView.swift in Sources */,
 				C9CA6AD02DCF87A900CF8BF1 /* NailStyle.swift in Sources */,
+				C93009B62DDE1AE70077C63E /* DesignsService.swift in Sources */,
 				C9B9858C2DD763650026673F /* CameraViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

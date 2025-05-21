@@ -18,22 +18,6 @@ class HandDetectionManager {
     }
     
     private func setupVisionModel() {
-        // В реальном приложении здесь загружается CoreML модель для распознавания рук и ногтей
-        // Поскольку у нас нет реальной модели, мы будем использовать стандартную Vision API для распознавания руки
-        
-        // Пример настройки для распознавания руки через Vision
-        // let modelURL = Bundle.main.url(forResource: "HandDetector", withExtension: "mlmodelc")
-        // if let modelURL = modelURL {
-        //     do {
-        //         visionModel = try VNCoreMLModel(for: MLModel(contentsOf: modelURL))
-        //         detectionRequest = VNCoreMLRequest(model: visionModel!) { [weak self] request, error in
-        //             self?.processDetections(request: request, error: error)
-        //         }
-        //         detectionRequest?.imageCropAndScaleOption = .scaleFit
-        //     } catch {
-        //         print("Ошибка загрузки модели: \(error)")
-        //     }
-        // }
     }
     
     // Запуск процесса детекции
@@ -48,11 +32,7 @@ class HandDetectionManager {
         
         isProcessing = true
         lastProcessingTime = now
-        
-        // В реальном приложении здесь используется Vision API для обнаружения руки
-        // Поскольку у нас нет модели, мы используем упрощенную реализацию
-        
-        // Простая оценка наличия руки по цвету кожи
+                
         let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
         let context = CIContext()
         
@@ -61,7 +41,6 @@ class HandDetectionManager {
             return
         }
         
-        // Упрощенная реализация - анализ центральной части изображения
         analyzeImageForHand(cgImage) { handDetected, handRect, confidence in
             DispatchQueue.main.async {
                 self.detectionCallback?(handDetected, handRect, confidence)
@@ -72,8 +51,6 @@ class HandDetectionManager {
     
     // Упрощенный метод анализа изображения
     private func analyzeImageForHand(_ image: CGImage, completion: @escaping (Bool, CGRect?, Double) -> Void) {
-        // В реальном приложении здесь бы использовался анализ на основе Vision API
-        // Для демонстрации используем упрощенный метод на основе цвета кожи
         
         // Создаем изображение меньшего размера для более быстрого анализа
         let size = CGSize(width: 200, height: 200 * CGFloat(image.height) / CGFloat(image.width))

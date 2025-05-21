@@ -6,12 +6,9 @@ struct HandImageOverlayView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Затемнение фона вокруг области руки
                 Color.black.opacity(0.3)
                     .edgesIgnoringSafeArea(.all)
                 
-                // Используем ваш контур руки как изображение
-                // Вариант 1: Если вы добавите изображение в Assets.xcassets
                 Image("hand_outline")
                     .resizable()
                     .scaledToFit()
@@ -19,7 +16,6 @@ struct HandImageOverlayView: View {
                     .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
                     .blendMode(.destinationOut)
                 
-                // Дублируем контур с обычной прозрачностью, чтобы он был виден
                 Image("hand_outline")
                     .resizable()
                     .scaledToFit()
@@ -28,7 +24,6 @@ struct HandImageOverlayView: View {
                     .colorMultiply(.white)
                     .opacity(0.8)
                 
-                // Надпись с инструкцией
                 VStack {
                     Text("Расположите руку в контуре")
                         .font(.headline)
@@ -47,7 +42,10 @@ struct HandImageOverlayView: View {
     }
 }
 
-// MARK: - Вариант с SVG-контуром (на случай, если изображение не подойдет)
+
+
+
+
 struct HandSVGOverlayView: View {
     var body: some View {
         GeometryReader { geometry in
@@ -88,7 +86,7 @@ struct HandSVGOverlayView: View {
     }
 }
 
-// Shape, которая воссоздает примерный контур вашей руки
+// Shape, которая воссоздает примерный контур руки
 struct HandOutlineShape: Shape {
     func path(in rect: CGRect) -> Path {
         let width = rect.width
@@ -133,7 +131,7 @@ struct HandOutlineShape: Shape {
     }
 }
 
-// MARK: - Инструкции по добавлению вашего изображения
+
 /*
  Чтобы использовать ваш контур руки, выполните следующие шаги:
  

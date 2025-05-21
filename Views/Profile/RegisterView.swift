@@ -5,6 +5,9 @@ struct RegisterView: View {
     @State private var username = ""
     @State private var email = ""
     @State private var password = ""
+    @State private var isMaster = false
+    @State private var salonName = ""
+    @State private var address = ""
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
@@ -17,13 +20,21 @@ struct RegisterView: View {
                     .frame(width: 80, height: 80)
                     .foregroundColor(.purple)
                 
-                Text("Create Account")
+                Text("Создание аккаунта")
                     .font(.largeTitle).bold()
-                Text("Join us and try nail designs")
+                Text("Присоединяйтесь к сообществу ногтевого дизайна")
                     .font(.subheadline).foregroundColor(.secondary)
                 
+                // Переключатель типа аккаунта
+                Picker("Тип аккаунта", selection: $isMaster) {
+                    Text("Клиент").tag(false)
+                    Text("Мастер/Салон").tag(true)
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .padding(.horizontal)
+                
                 VStack(spacing: 16) {
-                    TextField("Username", text: $username)
+                    TextField("Имя пользователя", text: $username)
                         .textContentType(.nickname)
                         .textFieldStyle(FieldStyle())
                     
@@ -32,20 +43,47 @@ struct RegisterView: View {
                         .textContentType(.emailAddress)
                         .textFieldStyle(FieldStyle())
                     
-                    SecureField("Password", text: $password)
+                    SecureField("Пароль", text: $password)
                         .textContentType(.newPassword)
                         .textFieldStyle(FieldStyle())
+                    
+                    if isMaster {
+                        TextField("Название салона", text: $salonName)
+                            .textContentType(.organizationName)
+                            .textFieldStyle(FieldStyle())
+                        
+                        TextField("Адрес", text: $address)
+                            .textContentType(.fullStreetAddress)
+                            .textFieldStyle(FieldStyle())
+                    }
                 }
                 .padding(.horizontal)
                 
                 Button("Зарегистрироваться") {
                     Task {
-                        await authVM.register(username: username, email: email, password: password)
+                        if isMaster {
+                            await authVM.registerMaster(
+                                username: username,
+                                email: email,
+                                password: password,
+                                salonName: salonName,
+                                address: address
+                            )
+                        } else {
+                            await authVM.registerClient(
+                                username: username,
+                                email: email,
+                                password: password
+                            )
+                        }
+                        
                         if authVM.user != nil { dismiss() }
                     }
                 }
                 .buttonStyle(PrimaryButtonStyle())
                 .padding(.horizontal)
+                .disabled(!isFormValid)
+                .opacity(isFormValid ? 1.0 : 0.5)
                 
                 HStack {
                     Text("Уже есть аккаунт?")
@@ -59,6 +97,29 @@ struct RegisterView: View {
                 Spacer()
             }
             .navigationBarHidden(true)
+            .overlay(
+                Group {
+                    if authVM.isLoading {
+                        Color.black.opacity(0.4)
+                            .ignoresSafeArea()
+                            .overlay(
+                                ProgressView()
+                                    .scaleEffect(2)
+                                    .tint(.white)
+                            )
+                    }
+                }
+            )
+        }
+    }
+    
+    private var isFormValid: Bool {
+        let basicValid = !username.isEmpty && !email.isEmpty && password.count >= 6
+        
+        if isMaster {
+            return basicValid && !salonName.isEmpty && !address.isEmpty
+        } else {
+            return basicValid
         }
     }
 }

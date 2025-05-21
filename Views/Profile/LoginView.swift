@@ -55,10 +55,31 @@ struct LoginView: View {
                 
                 Spacer()
                 
-                Button("Демо режим") {
-                    authVM.user = UserProfile(id: UUID(), username: "Admin", email: "")
-                    dismiss()
+                VStack(spacing: 8) {
+                    Button("Демо режим (Клиент)") {
+                        authVM.user = UserProfile(
+                            id: "demo_client",
+                            username: "Demo Client",
+                            email: "demo@example.com",
+                            role: .client
+                        )
+                        dismiss()
+                    }
+                    
+                    Button("Демо режим (Мастер)") {
+                        authVM.user = UserProfile(
+                            id: "demo_master",
+                            username: "Demo Master",
+                            email: "master@example.com",
+                            role: .master,
+                            salonName: "Демо Салон Красоты"
+                        )
+                        dismiss()
+                    }
                 }
+                .font(.footnote)
+                .foregroundColor(.secondary)
+                .padding(.bottom, 20)
                 .font(.footnote)
                 .foregroundColor(.secondary)
                 .padding(.bottom, 20)
