@@ -23,6 +23,7 @@
 		C971F21D2DDCE6230039BBDF /* NailLength.swift in Sources */ = {isa = PBXBuildFile; fileRef = C971F21C2DDCE6210039BBDF /* NailLength.swift */; };
 		C971F2202DDCE7500039BBDF /* DesignMaterial.swift in Sources */ = {isa = PBXBuildFile; fileRef = C971F21F2DDCE7500039BBDF /* DesignMaterial.swift */; };
 		C971F2222DDCE7690039BBDF /* DesignLength.swift in Sources */ = {isa = PBXBuildFile; fileRef = C971F2212DDCE7680039BBDF /* DesignLength.swift */; };
+		C9810F5E2DDEEE3A00437C92 /* MasterDesignDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9810F5D2DDEEE3700437C92 /* MasterDesignDetailView.swift */; };
 		C9B9858C2DD763650026673F /* CameraViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9B9858B2DD763630026673F /* CameraViewModel.swift */; };
 		C9B9858E2DD7636E0026673F /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9B9858D2DD7636D0026673F /* CameraView.swift */; };
 		C9B985902DD763920026673F /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9B9858F2DD763910026673F /* CameraPreviewView.swift */; };
@@ -99,6 +100,7 @@
 		C971F21C2DDCE6210039BBDF /* NailLength.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NailLength.swift; sourceTree = "<group>"; };
 		C971F21F2DDCE7500039BBDF /* DesignMaterial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignMaterial.swift; sourceTree = "<group>"; };
 		C971F2212DDCE7680039BBDF /* DesignLength.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignLength.swift; sourceTree = "<group>"; };
+		C9810F5D2DDEEE3700437C92 /* MasterDesignDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MasterDesignDetailView.swift; sourceTree = "<group>"; };
 		C9B5FCEA2DCD4C4F0042038A /* NailApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NailApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9B5FCFA2DCD4C500042038A /* NailAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NailAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C9B5FD042DCD4C500042038A /* NailAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NailAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -353,6 +355,7 @@
 		C9F5631B2DCEB06100706027 /* Designs */ = {
 			isa = PBXGroup;
 			children = (
+				C9810F5D2DDEEE3700437C92 /* MasterDesignDetailView.swift */,
 				C93009C92DDE4A640077C63E /* DesignPickerView.swift */,
 				C93009C32DDE49670077C63E /* EditDesignView.swift */,
 				C93009C12DDE494D0077C63E /* AddDesignView.swift */,
@@ -546,6 +549,7 @@
 				C93009C42DDE496C0077C63E /* EditDesignView.swift in Sources */,
 				C9CA6AC22DCF7D7F00CF8BF1 /* LoadingView.swift in Sources */,
 				C9CA6AD52DCF87C500CF8BF1 /* DesignType.swift in Sources */,
+				C9810F5E2DDEEE3A00437C92 /* MasterDesignDetailView.swift in Sources */,
 				C9CA6AC52DCF7D8C00CF8BF1 /* FilterViewModel.swift in Sources */,
 				C9F563332DCEB23000706027 /* ApiService.swift in Sources */,
 				C9F563292DCEB1FC00706027 /* FilterView.swift in Sources */,

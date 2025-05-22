@@ -14,18 +14,14 @@ struct EditDesignView: View {
     @State private var selectedSeason: Season
     @State private var selectedLength: NailLength
     @State private var selectedMaterial: DesignMaterial
-    @State private var showDeleteAlert = false
     
     init(viewModel: MasterDesignsViewModel, design: NailDesign, username: String) {
         self.viewModel = viewModel
         self.design = design
         self.username = username
         
-        // Инициализируем State переменные
         _name = State(initialValue: design.name)
         _description = State(initialValue: design.description)
-        
-        // Находим соответствующие enum значения или используем значения по умолчанию
         _selectedColor = State(initialValue: design.nailColors.first ?? .pink)
         _selectedType = State(initialValue: design.type ?? .french)
         _selectedSeason = State(initialValue: design.season ?? .everyday)
@@ -45,21 +41,36 @@ struct EditDesignView: View {
                 
                 ScrollView {
                     VStack(spacing: 20) {
-                        // Используем демо-изображение из ViewModel вместо AsyncImage
-                        Image(uiImage: viewModel.imageForDesign(design))
-                            .resizable()
-                            .scaledToFit()
+                        // Изображение дизайна
+                        if let url = design.imageURL {
+                            AsyncImage(url: url) { phase in
+                                switch phase {
+                                case .empty:
+                                    ProgressView()
+                                        .frame(height: 200)
+                                case .success(let image):
+                                    image
+                                        .resizable()
+                                        .scaledToFit()
+                                case .failure:
+                                    Color.gray.opacity(0.3)
+                                        .overlay(Text("Изображение недоступно").foregroundColor(.white))
+                                @unknown default:
+                                    EmptyView()
+                                }
+                            }
                             .frame(height: 200)
                             .cornerRadius(12)
                             .shadow(radius: 5)
+                        }
                         
                         Group {
                             TextField("Название", text: $name)
                                 .textFieldStyle(FieldStyle())
                             
-                            TextField("Описание", text: $description)
+                            TextField("Описание", text: $description, axis: .vertical)
                                 .textFieldStyle(FieldStyle())
-                                .frame(height: 100)
+                                .lineLimit(3...6)
                         }
                         
                         Group {
@@ -141,53 +152,31 @@ struct EditDesignView: View {
                             }
                         }
                         
-                        HStack(spacing: 16) {
-                            Button(action: {
-                                showDeleteAlert = true
-                            }) {
-                                Text("Удалить")
-                                    .font(.headline)
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                                    .background(Color.red.opacity(0.8))
-                                    .cornerRadius(12)
-                            }
-                            
-                            Button(action: {
-                                Task {
-                                    await updateDesign()
-                                }
-                            }) {
-                                Text("Сохранить")
-                                    .font(.headline)
-                                    .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                                    .background(
-                                        LinearGradient(
-                                            gradient: Gradient(colors: [.purple, .blue]),
-                                            startPoint: .leading,
-                                            endPoint: .trailing
-                                        )
-                                    )
-                                    .cornerRadius(12)
+                        Button("Сохранить изменения") {
+                            Task {
+                                await updateDesign()
                             }
                         }
+                        .buttonStyle(PrimaryButtonStyle())
+                        .padding(.horizontal)
+                        .disabled(viewModel.isLoading || !isFormValid)
+                        .opacity((viewModel.isLoading || !isFormValid) ? 0.5 : 1.0)
                         .padding(.top)
                     }
                     .padding()
-                    .disabled(viewModel.isLoading)
-                    .overlay(
-                        Group {
-                            if viewModel.isLoading {
-                                LoadingView()
-                            }
-                        }
-                    )
+                }
+                
+                if viewModel.isLoading {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                        .overlay(
+                            ProgressView()
+                                .scaleEffect(2)
+                                .tint(.white)
+                        )
                 }
             }
-            .navigationTitle("Редактирование дизайна")
+            .navigationTitle("Редактирование")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -197,23 +186,14 @@ struct EditDesignView: View {
                     .foregroundColor(.white)
                 }
             }
-            .alert(isPresented: $showDeleteAlert) {
-                Alert(
-                    title: Text("Удалить дизайн"),
-                    message: Text("Вы уверены, что хотите удалить этот дизайн? Это действие нельзя отменить."),
-                    primaryButton: .destructive(Text("Удалить")) {
-                        Task {
-                            await deleteDesign()
-                        }
-                    },
-                    secondaryButton: .cancel(Text("Отмена"))
-                )
-            }
         }
     }
     
+    private var isFormValid: Bool {
+        !name.isEmpty && !description.isEmpty
+    }
+    
     private func updateDesign() async {
-        // Создаем обновленный дизайн
         let updatedDesign = NailDesign(
             id: design.id,
             name: name,
@@ -230,14 +210,6 @@ struct EditDesignView: View {
         )
         
         let success = await viewModel.updateDesign(updatedDesign, username: username)
-        
-        if success {
-            dismiss()
-        }
-    }
-    
-    private func deleteDesign() async {
-        let success = await viewModel.deleteDesign(id: design.id, username: username)
         
         if success {
             dismiss()
