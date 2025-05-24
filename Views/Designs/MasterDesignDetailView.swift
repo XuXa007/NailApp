@@ -110,7 +110,7 @@ struct MasterDesignDetailView: View {
             Button("Удалить", role: .destructive) {
                 Task {
                     if let username = authVM.user?.username {
-                        let success = await viewModel.deleteDesign(id: design.id, username: username)
+                        let success = await viewModel.deleteDesign(id: design.id)
                         if success {
                             dismiss()
                         }

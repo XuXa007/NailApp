@@ -1,10 +1,14 @@
 import Foundation
 import UIKit
 
+//  http://172.20.10.7:8080
+//  http://192.168.1.8:8080
+
 struct Config {
     static var baseURL: String {
         #if DEBUG
-        return UserDefaults.standard.string(forKey: "server_url") ?? "http://192.168.1.8:8080"
+        return UserDefaults.standard.string(forKey: "server_url") ?? "http://172.20.10.7:8080"
+        
         #else
         return "https://api.yournaildomain.com"
         #endif

@@ -14,7 +14,6 @@ final class FavoritesViewModel: ObservableObject {
     
     // Защита от повторных запросов
     private var loadingTask: Task<Void, Never>?
-    private var lastLoadedUsername: String?
     
     // Метод для установки ссылки на AuthViewModel
     func setAuthViewModel(_ authVM: AuthViewModel) {
@@ -23,8 +22,8 @@ final class FavoritesViewModel: ObservableObject {
     
     // Загрузка избранного с сервера
     func loadFavorites() async {
-        guard let user = authViewModel?.user else {
-            print("Пользователь не найден в authViewModel")
+        guard AuthService.shared.isAuthenticated else {
+            print("Пользователь не аутентифицирован")
             await MainActor.run {
                 items = []
                 favoriteIds = []
@@ -32,27 +31,18 @@ final class FavoritesViewModel: ObservableObject {
             return
         }
         
-        // Проверяем, не загружаем ли мы уже для этого пользователя
-        if lastLoadedUsername == user.username && isLoading {
-            print("Уже загружаем избранное для \(user.username), пропускаем")
-            return
-        }
-        
-        // Отменяем предыдущую задачу если есть
         loadingTask?.cancel()
         
-        print("Загружаем избранное для пользователя: \(user.username)")
+        print("Загружаем избранное для аутентифицированного пользователя")
         
-        // Создаем новую задачу
         loadingTask = Task {
             await MainActor.run {
                 isLoading = true
                 errorMessage = nil
-                lastLoadedUsername = user.username
             }
             
             do {
-                let favorites = try await ApiService.shared.fetchFavorites(username: user.username)
+                let favorites = try await ApiService.shared.fetchFavorites()
                 
                 // Проверяем, не отменили ли задачу
                 if Task.isCancelled {
@@ -65,6 +55,11 @@ final class FavoritesViewModel: ObservableObject {
                     favoriteIds = Set(favorites.map { $0.id })
                     print("Загружено избранных дизайнов: \(favorites.count)")
                 }
+            } catch AuthError.noToken {
+                print("Нет токена аутентификации")
+                await MainActor.run {
+                    authViewModel?.logout()
+                }
             } catch {
                 if Task.isCancelled {
                     print("Задача загрузки избранного отменена")
@@ -73,9 +68,8 @@ final class FavoritesViewModel: ObservableObject {
                 
                 print("Ошибка загрузки избранного:", error)
                 await MainActor.run {
-                    // Не показываем ошибку пользователю, просто оставляем пустой список
-                    items = []
-                    favoriteIds = []
+                    errorMessage = error.localizedDescription
+                    // Не очищаем список при ошибке, оставляем кэш
                 }
             }
             
@@ -89,12 +83,13 @@ final class FavoritesViewModel: ObservableObject {
     
     // Добавление/удаление из избранного
     func toggle(_ design: NailDesign) {
-        guard let user = authViewModel?.user else {
-            print("Пользователь не авторизован в toggle")
+        guard AuthService.shared.isAuthenticated else {
+            print("Пользователь не аутентифицирован для toggle")
+            authViewModel?.logout()
             return
         }
         
-        print("Переключаем избранное для дизайна \(design.id), пользователь: \(user.username)")
+        print("Переключаем избранное для дизайна \(design.id)")
         
         let wasInFavorites = favoriteIds.contains(design.id)
         
@@ -113,11 +108,16 @@ final class FavoritesViewModel: ObservableObject {
         Task {
             do {
                 if wasInFavorites {
-                    try await ApiService.shared.removeFavorite(id: design.id, username: user.username)
+                    try await ApiService.shared.removeFavorite(id: design.id)
                     print("Дизайн \(design.id) удален из избранного")
                 } else {
-                    try await ApiService.shared.addFavorite(id: design.id, username: user.username)
+                    try await ApiService.shared.addFavorite(id: design.id)
                     print("Дизайн \(design.id) добавлен в избранное")
+                }
+            } catch AuthError.noToken {
+                print("Нет токена аутентификации при toggle")
+                await MainActor.run {
+                    authViewModel?.logout()
                 }
             } catch {
                 print("Ошибка при обновлении избранного:", error)
@@ -132,6 +132,7 @@ final class FavoritesViewModel: ObservableObject {
                         favoriteIds.remove(design.id)
                         items.removeAll { $0.id == design.id }
                     }
+                    errorMessage = "Ошибка обновления избранного: \(error.localizedDescription)"
                 }
             }
         }
@@ -139,7 +140,7 @@ final class FavoritesViewModel: ObservableObject {
     
     // Проверка, находится ли дизайн в избранном
     func isFavorite(_ design: NailDesign) -> Bool {
-        guard authViewModel?.user != nil else { return false }
+        guard AuthService.shared.isAuthenticated else { return false }
         return favoriteIds.contains(design.id)
     }
     
@@ -147,10 +148,18 @@ final class FavoritesViewModel: ObservableObject {
     func clearFavorites() {
         loadingTask?.cancel()
         loadingTask = nil
-        lastLoadedUsername = nil
         items = []
         favoriteIds = []
         errorMessage = nil
         isLoading = false
+        print("Очищено избранное при выходе из аккаунта")
+    }
+    
+    func refreshFavorites() async {
+        await loadFavorites()
+    }
+    
+    func clearError() {
+        errorMessage = nil
     }
 }

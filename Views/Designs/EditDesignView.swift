@@ -209,7 +209,7 @@ struct EditDesignView: View {
             salonName: design.salonName
         )
         
-        let success = await viewModel.updateDesign(updatedDesign, username: username)
+        let success = await viewModel.updateDesign(updatedDesign)
         
         if success {
             dismiss()

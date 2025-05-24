@@ -1,11 +1,52 @@
 import Foundation
 
-enum ApiError: Error {
+enum ApiError: Error, LocalizedError {
     case urlError
     case networkError(Error)
     case badResponse
     case decodingError(Error)
+    case unauthorized
+    case forbidden
+    case notFound
+    case serverError(String)
+    case invalidData
+    case timeout
+    
+    var errorDescription: String? {
+        switch self {
+        case .urlError:
+            return "Некорректный URL запроса"
+        case .networkError(let error):
+            return "Ошибка сети: \(error.localizedDescription)"
+        case .badResponse:
+            return "Некорректный ответ сервера"
+        case .decodingError(let error):
+            return "Ошибка декодирования данных: \(error.localizedDescription)"
+        case .unauthorized:
+            return "Ошибка авторизации"
+        case .forbidden:
+            return "Доступ запрещен"
+        case .notFound:
+            return "Ресурс не найден"
+        case .serverError(let message):
+            return "Ошибка сервера: \(message)"
+        case .invalidData:
+            return "Некорректные данные"
+        case .timeout:
+            return "Превышено время ожидания"
+        }
+    }
+    
+    var isAuthenticationError: Bool {
+        switch self {
+        case .unauthorized, .forbidden:
+            return true
+        default:
+            return false
+        }
+    }
 }
+
 
 class ApiService {
     static let shared = ApiService()
@@ -21,109 +62,6 @@ class ApiService {
         return url
     }
     
-    
-    func fetchDesigns(using filter: DesignFilter) async throws -> [NailDesign] {
-        var comps = URLComponents(url: baseURL.appendingPathComponent("api/designs"),
-                                  resolvingAgainstBaseURL: false)
-        let queryItems: [URLQueryItem] = []
-        comps?.queryItems = queryItems.isEmpty ? nil : queryItems
-        
-        guard let url = comps?.url else {
-            throw ApiError.urlError
-        }
-        print("[ApiService] GET \(url.absoluteString)")
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        
-        do {
-            let (data, response) = try await URLSession.shared.data(for: request)
-            if let http = response as? HTTPURLResponse {
-                print("[ApiService] statusCode = \(http.statusCode)")
-                if !(200..<300).contains(http.statusCode) {
-                    let body = String(data: data, encoding: .utf8) ?? "<empty body>"
-                    print("[ApiService] response body:\n\(body)")
-                    throw ApiError.badResponse
-                }
-            }
-            // парсим
-            let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
-            return try decoder.decode([NailDesign].self, from: data)
-        } catch let err as ApiError {
-            throw err
-        } catch {
-            throw ApiError.networkError(error)
-        }
-    }
-    
-    func login(username: String, password: String) async throws -> UserProfile {
-        let url = baseURL.appendingPathComponent("/api/auth/login")
-        var req = URLRequest(url: url)
-        req.httpMethod = "POST"
-        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        let body = ["username": username, "password": password]
-        req.httpBody = try JSONEncoder().encode(body)
-        
-        let (data, resp) = try await URLSession.shared.data(for: req)
-        guard let http = resp as? HTTPURLResponse, 200..<300 ~= http.statusCode
-        else { throw ApiError.badResponse }
-        
-        return try JSONDecoder().decode(UserProfile.self, from: data)
-    }
-    
-    func register(username: String, email: String, password: String) async throws -> UserProfile {
-        let url = baseURL.appendingPathComponent("/api/auth/register")
-        var req = URLRequest(url: url)
-        req.httpMethod = "POST"
-        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        let body = ["username": username, "email": email, "password": password]
-        req.httpBody = try JSONEncoder().encode(body)
-        
-        let (data, resp) = try await URLSession.shared.data(for: req)
-        guard let http = resp as? HTTPURLResponse, 200..<300 ~= http.statusCode
-        else { throw ApiError.badResponse }
-        
-        return try JSONDecoder().decode(UserProfile.self, from: data)
-    }
-    
-    func fetchFavorites() async throws -> [NailDesign] {
-        let url = baseURL.appendingPathComponent("api/auth/favorites")
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard let http = response as? HTTPURLResponse, 200..<300 ~= http.statusCode else {
-            throw ApiError.badResponse
-        }
-        
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-        return try decoder.decode([NailDesign].self, from: data)
-    }
-    
-    func addFavorite(id: String) async throws {
-        let url = baseURL.appendingPathComponent("api/auth/favorites/\(id)")
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        
-        let (_, response) = try await URLSession.shared.data(for: request)
-        guard let http = response as? HTTPURLResponse, 200..<300 ~= http.statusCode else {
-            throw ApiError.badResponse
-        }
-    }
-    
-    func removeFavorite(id: String) async throws {
-        let url = baseURL.appendingPathComponent("api/auth/favorites/\(id)")
-        var request = URLRequest(url: url)
-        request.httpMethod = "DELETE"
-        
-        let (_, response) = try await URLSession.shared.data(for: request)
-        guard let http = response as? HTTPURLResponse, 200..<300 ~= http.statusCode else {
-            throw ApiError.badResponse
-        }
-    }
-    
     func fetchDesigns(using filter: DesignFilter? = nil) async throws -> [NailDesign] {
         if filter == nil ||
             (filter!.selectedColors.isEmpty &&
@@ -136,24 +74,28 @@ class ApiService {
             guard let url = comps?.url else {
                 throw ApiError.urlError
             }
-            print("[ApiService] GET \(url.absoluteString)")
             
             var request = URLRequest(url: url)
             request.httpMethod = "GET"
             
-            let (data, response) = try await URLSession.shared.data(for: request)
-            if let http = response as? HTTPURLResponse {
-                print("[ApiService] statusCode = \(http.statusCode)")
-                if !(200..<300).contains(http.statusCode) {
-                    let body = String(data: data, encoding: .utf8) ?? "<empty body>"
-                    print("[ApiService] response body:\n\(body)")
-                    throw ApiError.badResponse
+            do {
+                let (data, response) = try await URLSession.shared.data(for: request)
+                if let http = response as? HTTPURLResponse {
+                    if !(200..<300).contains(http.statusCode) {
+                        throw ApiError.badResponse
+                    }
+                }
+                
+                let decoder = JSONDecoder()
+                decoder.dateDecodingStrategy = .iso8601
+                return try decoder.decode([NailDesign].self, from: data)
+            } catch {
+                if error is ApiError {
+                    throw error
+                } else {
+                    throw ApiError.networkError(error)
                 }
             }
-            
-            let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
-            return try decoder.decode([NailDesign].self, from: data)
         } else {
             return try await fetchDesignsWithFilter(filter!)
         }
@@ -172,78 +114,186 @@ class ApiService {
             "types": Array(filter.selectedTypes.map { $0.rawValue })
         ]
         
-        request.httpBody = try JSONEncoder().encode(filterData)
-        
-        print("[ApiService] POST \(url.absoluteString)")
-        print("[ApiService] Body: \(String(data: request.httpBody!, encoding: .utf8) ?? "")")
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
-        if let http = response as? HTTPURLResponse {
-            print("[ApiService] statusCode = \(http.statusCode)")
-            if !(200..<300).contains(http.statusCode) {
-                let body = String(data: data, encoding: .utf8) ?? "<empty body>"
-                print("[ApiService] response body:\n\(body)")
-                throw ApiError.badResponse
+        do {
+            request.httpBody = try JSONEncoder().encode(filterData)
+            
+            let (data, response) = try await URLSession.shared.data(for: request)
+            if let http = response as? HTTPURLResponse {
+                if !(200..<300).contains(http.statusCode) {
+                    throw ApiError.badResponse
+                }
+            }
+            
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            return try decoder.decode([NailDesign].self, from: data)
+        } catch {
+            if error is ApiError {
+                throw error
+            } else {
+                throw ApiError.networkError(error)
             }
         }
-        
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-        return try decoder.decode([NailDesign].self, from: data)
     }
     
-    func registerMaster(username: String, email: String, password: String,
-                        salonName: String, address: String) async throws -> UserProfile {
-        let url = baseURL.appendingPathComponent("/api/auth/register/master")
-        var req = URLRequest(url: url)
-        req.httpMethod = "POST"
-        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        let body = [
-            "username": username,
-            "email": email,
-            "password": password,
-            "salonName": salonName,
-            "address": address
-        ]
-        req.httpBody = try JSONEncoder().encode(body)
-        
-        let (data, resp) = try await URLSession.shared.data(for: req)
-        guard let http = resp as? HTTPURLResponse, 200..<300 ~= http.statusCode
-        else { throw ApiError.badResponse }
-        
-        return try JSONDecoder().decode(UserProfile.self, from: data)
-    }
     
-    func getMasterDesigns(username: String) async throws -> [NailDesign] {
-        let url = baseURL.appendingPathComponent("/api/master/designs/my")
-        var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
-        components?.queryItems = [URLQueryItem(name: "username", value: username)]
+    func fetchFavorites() async throws -> [NailDesign] {
+        let url = baseURL.appendingPathComponent("api/auth/favorites")
+        let request = try AuthService.shared.createAuthenticatedRequest(url: url)
         
-        guard let requestURL = components?.url else {
-            throw ApiError.urlError
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse else {
+                throw ApiError.badResponse
+            }
+            
+            if http.statusCode == 401 {
+                try await AuthService.shared.refreshToken()
+                return try await fetchFavorites() // Повторяем запрос
+            }
+            
+            if !(200..<300).contains(http.statusCode) {
+                switch http.statusCode {
+                case 403:
+                    throw ApiError.forbidden
+                case 404:
+                    throw ApiError.notFound
+                default:
+                    throw ApiError.badResponse
+                }
+            }
+            
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            return try decoder.decode([NailDesign].self, from: data)
+        } catch {
+            if error is ApiError || error is AuthError {
+                throw error
+            } else {
+                throw ApiError.networkError(error)
+            }
         }
+    }
+    
+    func addFavorite(id: String) async throws {
+        let url = baseURL.appendingPathComponent("api/auth/favorites/\(id)")
+        let request = try AuthService.shared.createAuthenticatedRequest(url: url, method: "POST")
         
-        var request = URLRequest(url: requestURL)
-        request.httpMethod = "GET"
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse else {
+                throw ApiError.badResponse
+            }
+            
+            if http.statusCode == 401 {
+                try await AuthService.shared.refreshToken()
+                return try await addFavorite(id: id)
+            }
+            
+            if !(200..<300).contains(http.statusCode) {
+                switch http.statusCode {
+                case 403:
+                    throw ApiError.forbidden
+                case 404:
+                    throw ApiError.notFound
+                default:
+                    throw ApiError.badResponse
+                }
+            }
+        } catch {
+            if error is ApiError || error is AuthError {
+                throw error
+            } else {
+                throw ApiError.networkError(error)
+            }
+        }
+    }
+    
+    func removeFavorite(id: String) async throws {
+        let url = baseURL.appendingPathComponent("api/auth/favorites/\(id)")
+        let request = try AuthService.shared.createAuthenticatedRequest(url: url, method: "DELETE")
         
-        let (data, resp) = try await URLSession.shared.data(for: request)
-        guard let http = resp as? HTTPURLResponse, 200..<300 ~= http.statusCode
-        else { throw ApiError.badResponse }
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse else {
+                throw ApiError.badResponse
+            }
+            
+            if http.statusCode == 401 {
+                try await AuthService.shared.refreshToken()
+                return try await removeFavorite(id: id)
+            }
+            
+            if !(200..<300).contains(http.statusCode) {
+                switch http.statusCode {
+                case 403:
+                    throw ApiError.forbidden
+                case 404:
+                    throw ApiError.notFound
+                default:
+                    throw ApiError.badResponse
+                }
+            }
+        } catch {
+            if error is ApiError || error is AuthError {
+                throw error
+            } else {
+                throw ApiError.networkError(error)
+            }
+        }
+    }
+    
+    
+    func getMasterDesigns() async throws -> [NailDesign] {
+        let url = baseURL.appendingPathComponent("api/master/designs/my")
+        let request = try AuthService.shared.createAuthenticatedRequest(url: url)
         
-        return try JSONDecoder().decode([NailDesign].self, from: data)
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse else {
+                throw ApiError.badResponse
+            }
+            
+            if http.statusCode == 401 {
+                try await AuthService.shared.refreshToken()
+                return try await getMasterDesigns()
+            }
+            
+            if !(200..<300).contains(http.statusCode) {
+                switch http.statusCode {
+                case 403:
+                    throw ApiError.forbidden
+                case 404:
+                    throw ApiError.notFound
+                default:
+                    throw ApiError.badResponse
+                }
+            }
+            
+            return try JSONDecoder().decode([NailDesign].self, from: data)
+        } catch {
+            if error is ApiError || error is AuthError {
+                throw error
+            } else {
+                throw ApiError.networkError(error)
+            }
+        }
     }
     
     func uploadDesign(name: String, description: String,
                      designType: String, color: String,
                      occasion: String, length: String,
-                     material: String, image: Data,
-                     username: String) async throws -> NailDesign {
-        let url = baseURL.appendingPathComponent("/api/master/designs")
+                     material: String, image: Data) async throws -> NailDesign {
         
-        // Создаем multipart/form-data запрос
+        let url = baseURL.appendingPathComponent("api/master/designs")
+        
+        guard let token = AuthService.shared.currentToken else {
+            throw AuthError.noToken
+        }
+        
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
         let boundary = "Boundary-\(UUID().uuidString)"
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
@@ -258,8 +308,7 @@ class ApiService {
             "color": color,
             "occasion": occasion,
             "length": length,
-            "material": material,
-            "username": username
+            "material": material
         ]
         
         for (key, value) in fields {
@@ -279,134 +328,111 @@ class ApiService {
         
         request.httpBody = body
         
-        let (data, resp) = try await URLSession.shared.data(for: request)
-        guard let http = resp as? HTTPURLResponse, 200..<300 ~= http.statusCode
-        else { throw ApiError.badResponse }
-        
-        return try JSONDecoder().decode(NailDesign.self, from: data)
-    }
-        
-    func updateDesign(design: NailDesign, username: String) async throws -> NailDesign {
-        guard let url = URL(string: "\(baseURL)/api/master/designs/\(design.id)") else {
-            throw ApiError.urlError
+        do {
+            let (data, resp) = try await URLSession.shared.data(for: request)
+            guard let http = resp as? HTTPURLResponse else {
+                throw ApiError.badResponse
+            }
+            
+            if http.statusCode == 401 {
+                try await AuthService.shared.refreshToken()
+                return try await uploadDesign(name: name, description: description, designType: designType, color: color, occasion: occasion, length: length, material: material, image: image)
+            }
+            
+            if !(200..<300).contains(http.statusCode) {
+                switch http.statusCode {
+                case 403:
+                    throw ApiError.forbidden
+                case 404:
+                    throw ApiError.notFound
+                default:
+                    throw ApiError.badResponse
+                }
+            }
+            
+            return try JSONDecoder().decode(NailDesign.self, from: data)
+        } catch {
+            if error is ApiError || error is AuthError {
+                throw error
+            } else {
+                throw ApiError.networkError(error)
+            }
         }
-        
-        var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
-        components?.queryItems = [URLQueryItem(name: "username", value: username)]
-        
-        guard let requestURL = components?.url else {
-            throw ApiError.urlError
-        }
-        
-        var request = URLRequest(url: requestURL)
-        request.httpMethod = "PUT"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        // Кодируем дизайн в JSON
-        let encoder = JSONEncoder()
-        request.httpBody = try encoder.encode(design)
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        guard let httpResponse = response as? HTTPURLResponse,
-              200..<300 ~= httpResponse.statusCode else {
-            throw ApiError.badResponse
-        }
-        
-        // Декодируем и возвращаем обновленный дизайн
-        let decoder = JSONDecoder()
-        return try decoder.decode(NailDesign.self, from: data)
     }
     
-    func deleteDesign(id: String, username: String) async throws {
-         guard let url = URL(string: "\(baseURL)/api/master/designs/\(id)") else {
-             throw ApiError.urlError
-         }
-         
-         var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
-         components?.queryItems = [URLQueryItem(name: "username", value: username)]
-         
-         guard let requestURL = components?.url else {
-             throw ApiError.urlError
-         }
-         
-         var request = URLRequest(url: requestURL)
-         request.httpMethod = "DELETE"
-         
-         let (_, response) = try await URLSession.shared.data(for: request)
-         
-         guard let httpResponse = response as? HTTPURLResponse,
-               200..<300 ~= httpResponse.statusCode else {
-             throw ApiError.badResponse
-         }
-     }
+    func updateDesign(design: NailDesign) async throws -> NailDesign {
+        let url = baseURL.appendingPathComponent("api/master/designs/\(design.id)")
+        var request = try AuthService.shared.createAuthenticatedRequest(url: url, method: "PUT")
+        
+        do {
+            let encoder = JSONEncoder()
+            request.httpBody = try encoder.encode(design)
+            
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw ApiError.badResponse
+            }
+            
+            if httpResponse.statusCode == 401 {
+                try await AuthService.shared.refreshToken()
+                return try await updateDesign(design: design)
+            }
+            
+            if !(200..<300).contains(httpResponse.statusCode) {
+                switch httpResponse.statusCode {
+                case 403:
+                    throw ApiError.forbidden
+                case 404:
+                    throw ApiError.notFound
+                default:
+                    throw ApiError.badResponse
+                }
+            }
+            
+            let decoder = JSONDecoder()
+            return try decoder.decode(NailDesign.self, from: data)
+        } catch {
+            if error is ApiError || error is AuthError {
+                throw error
+            } else {
+                throw ApiError.networkError(error)
+            }
+        }
+    }
     
-    func fetchFavorites(username: String = "demo_client") async throws -> [NailDesign] {
-        var components = URLComponents(url: baseURL.appendingPathComponent("api/auth/favorites"), resolvingAgainstBaseURL: true)
-        components?.queryItems = [URLQueryItem(name: "username", value: username)]
+    func deleteDesign(id: String) async throws {
+        let url = baseURL.appendingPathComponent("api/master/designs/\(id)")
+        let request = try AuthService.shared.createAuthenticatedRequest(url: url, method: "DELETE")
         
-        guard let url = components?.url else {
-            throw ApiError.urlError
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        
-        print("[ApiService] GET \(url.absoluteString)")
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
-        guard let http = response as? HTTPURLResponse else {
-            throw ApiError.badResponse
-        }
-        
-        print("[ApiService] Favorites response status: \(http.statusCode)")
-        
-        if !(200..<300).contains(http.statusCode) {
-            let body = String(data: data, encoding: .utf8) ?? "<empty body>"
-            print("[ApiService] Favorites error response: \(body)")
-            throw ApiError.badResponse
-        }
-        
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-        return try decoder.decode([NailDesign].self, from: data)
-    }
-
-    func addFavorite(id: String, username: String = "demo_client") async throws {
-        var components = URLComponents(url: baseURL.appendingPathComponent("api/auth/favorites/\(id)"), resolvingAgainstBaseURL: true)
-        components?.queryItems = [URLQueryItem(name: "username", value: username)]
-        
-        guard let url = components?.url else {
-            throw ApiError.urlError
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        
-        print("[ApiService] POST \(url.absoluteString)")
-        
-        let (_, response) = try await URLSession.shared.data(for: request)
-        guard let http = response as? HTTPURLResponse, 200..<300 ~= http.statusCode else {
-            throw ApiError.badResponse
-        }
-    }
-
-    func removeFavorite(id: String, username: String = "demo_client") async throws {
-        var components = URLComponents(url: baseURL.appendingPathComponent("api/auth/favorites/\(id)"), resolvingAgainstBaseURL: true)
-        components?.queryItems = [URLQueryItem(name: "username", value: username)]
-        
-        guard let url = components?.url else {
-            throw ApiError.urlError
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "DELETE"
-        
-        print("[ApiService] DELETE \(url.absoluteString)")
-        
-        let (_, response) = try await URLSession.shared.data(for: request)
-        guard let http = response as? HTTPURLResponse, 200..<300 ~= http.statusCode else {
-            throw ApiError.badResponse
+        do {
+            let (_, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw ApiError.badResponse
+            }
+            
+            if httpResponse.statusCode == 401 {
+                try await AuthService.shared.refreshToken()
+                return try await deleteDesign(id: id)
+            }
+            
+            if !(200..<300).contains(httpResponse.statusCode) {
+                switch httpResponse.statusCode {
+                case 403:
+                    throw ApiError.forbidden
+                case 404:
+                    throw ApiError.notFound
+                default:
+                    throw ApiError.badResponse
+                }
+            }
+        } catch {
+            if error is ApiError || error is AuthError {
+                throw error
+            } else {
+                throw ApiError.networkError(error)
+            }
         }
     }
 }

@@ -41,10 +41,24 @@ struct LoginView: View {
                         .foregroundColor(.white.opacity(0.8))
                         .padding(.bottom, 20)
                     
+                    if let errorMessage = authVM.errorMessage {
+                        Text(errorMessage)
+                            .font(.subheadline)
+                            .foregroundColor(.red)
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
+                            .background(Color.white.opacity(0.1))
+                            .cornerRadius(8)
+                            .onTapGesture {
+                                authVM.clearError()
+                            }
+                    }
+                    
                     // Login form
                     VStack(spacing: 16) {
                         TextField("Имя пользователя", text: $username)
                             .textContentType(.username)
+                            .autocapitalization(.none)
                             .textFieldStyle(FieldStyle())
                         
                         SecureField("Пароль", text: $password)
@@ -55,10 +69,8 @@ struct LoginView: View {
                     
                     // Login button
                     Button("Войти") {
-                        authVM.login(username: username, password: password)
-                        
-                        // Отложенное закрытие экрана
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                        Task {
+                            await authVM.login(username: username, password: password)
                             if authVM.user != nil {
                                 dismiss()
                             }
@@ -66,8 +78,8 @@ struct LoginView: View {
                     }
                     .buttonStyle(PrimaryButtonStyle())
                     .padding(.horizontal)
-                    .disabled(authVM.isLoading)
-                    .opacity(authVM.isLoading ? 0.5 : 1.0)
+                    .disabled(authVM.isLoading || username.isEmpty || password.isEmpty)
+                    .opacity((authVM.isLoading || username.isEmpty || password.isEmpty) ? 0.5 : 1.0)
                     
                     // Register link
                     HStack {
@@ -82,55 +94,57 @@ struct LoginView: View {
                     
                     Spacer()
                     
-                    // Demo login options
-                    VStack(spacing: 16) {
-                        Text("Быстрый вход для демонстрации")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                        
-                        HStack(spacing: 16) {
-                            Button {
-                                authVM.loginAsClient()
-                                dismiss()
-                            } label: {
-                                VStack {
-                                    Image(systemName: "person.fill")
-                                        .font(.system(size: 24))
-                                        .padding(.bottom, 4)
-                                    Text("Клиент")
-                                        .font(.caption)
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
-                                .background(Color.white.opacity(0.2))
-                                .cornerRadius(12)
+                    // Demo login options (для разработки)
+                    if Config.baseURL.contains("192.168") || Config.baseURL.contains("localhost") {
+                        VStack(spacing: 16) {
+                            Text("Быстрый вход для демонстрации")
+                                .font(.headline)
                                 .foregroundColor(.white)
-                            }
                             
-                            Button {
-                                authVM.loginAsMaster()
-                                dismiss()
-                            } label: {
-                                VStack {
-                                    Image(systemName: "scissors")
-                                        .font(.system(size: 24))
-                                        .padding(.bottom, 4)
-                                    Text("Мастер")
-                                        .font(.caption)
+                            HStack(spacing: 16) {
+                                Button {
+                                    authVM.loginAsClient()
+                                    dismiss()
+                                } label: {
+                                    VStack {
+                                        Image(systemName: "person.fill")
+                                            .font(.system(size: 24))
+                                            .padding(.bottom, 4)
+                                        Text("Демо Клиент")
+                                            .font(.caption)
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 16)
+                                    .background(Color.white.opacity(0.2))
+                                    .cornerRadius(12)
+                                    .foregroundColor(.white)
                                 }
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
-                                .background(Color.white.opacity(0.2))
-                                .cornerRadius(12)
-                                .foregroundColor(.white)
+                                
+                                Button {
+                                    authVM.loginAsMaster()
+                                    dismiss()
+                                } label: {
+                                    VStack {
+                                        Image(systemName: "scissors")
+                                            .font(.system(size: 24))
+                                            .padding(.bottom, 4)
+                                        Text("Демо Мастер")
+                                            .font(.caption)
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 16)
+                                    .background(Color.white.opacity(0.2))
+                                    .cornerRadius(12)
+                                    .foregroundColor(.white)
+                                }
                             }
                         }
+                        .padding()
+                        .background(Color.black.opacity(0.1))
+                        .cornerRadius(16)
+                        .padding(.horizontal)
+                        .padding(.bottom, 30)
                     }
-                    .padding()
-                    .background(Color.black.opacity(0.1))
-                    .cornerRadius(16)
-                    .padding(.horizontal)
-                    .padding(.bottom, 30)
                 }
             }
             .navigationBarHidden(true)
@@ -140,13 +154,24 @@ struct LoginView: View {
                         Color.black.opacity(0.4)
                             .ignoresSafeArea()
                             .overlay(
-                                ProgressView()
-                                    .scaleEffect(2)
-                                    .tint(.white)
+                                VStack {
+                                    ProgressView()
+                                        .scaleEffect(2)
+                                        .tint(.white)
+                                    
+                                    Text("Вход в систему...")
+                                        .foregroundColor(.white)
+                                        .padding(.top)
+                                }
                             )
                     }
                 }
             )
+        }
+        .onAppear {
+            username = ""
+            password = ""
+            authVM.clearError()
         }
     }
 }

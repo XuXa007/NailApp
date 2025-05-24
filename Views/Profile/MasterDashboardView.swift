@@ -5,6 +5,7 @@ struct MasterDashboardView: View {
     @StateObject private var viewModel = MasterDesignsViewModel()
     @State private var showAddDesign = false
     @State private var hasLoaded = false
+    @State private var showErrorAlert = false
     
     var body: some View {
         ZStack {
@@ -119,12 +120,16 @@ struct MasterDashboardView: View {
                 await viewModel.loadDesigns(username: username)
             }
         }
-        .alert("Ошибка", isPresented: .constant(viewModel.errorMessage != nil)) {
+        .alert("Ошибка", isPresented: $showErrorAlert) {
             Button("OK") {
                 viewModel.errorMessage = nil
+                showErrorAlert = false
             }
         } message: {
             Text(viewModel.errorMessage ?? "")
+        }
+        .onChange(of: viewModel.errorMessage) { _, errorMessage in
+            showErrorAlert = errorMessage != nil
         }
     }
 }

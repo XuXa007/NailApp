@@ -1,5 +1,9 @@
 import Foundation
 
+
+//  http://172.20.10.7:8080
+//  http://192.168.1.8:8080
+
 struct NailDesign: Identifiable, Codable {
     let id: String
     let name: String
@@ -26,7 +30,7 @@ struct NailDesign: Identifiable, Codable {
     
     var imageURL: URL? {
         if imagePath.hasPrefix("http") {
-            let updatedPath = imagePath.replacingOccurrences(of: "192.168.1.5", with: "192.168.1.8")
+            let updatedPath = imagePath.replacingOccurrences(of: "192.168.1.5", with: "172.20.10.7")
             return URL(string: updatedPath)
         }
         

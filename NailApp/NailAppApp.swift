@@ -13,9 +13,31 @@ struct NailAppApp: App {
                 .environmentObject(designsVM)
                 .environmentObject(favVM)
                 .onAppear {
-                    // Связываем FavoritesViewModel с AuthViewModel
-                    favVM.setAuthViewModel(authVM)
+                    setupViewModels()
                 }
+                .task {
+                    // Проверяем токен при запуске приложения
+                    await refreshUserProfile()
+                }
+        }
+    }
+    
+    private func setupViewModels() {
+        // Связываем ViewModels
+        favVM.setAuthViewModel(authVM)
+        authVM.setFavoritesViewModel(favVM)
+        
+        print("ViewModels связаны")
+    }
+    
+    private func refreshUserProfile() async {
+        if AuthService.shared.isAuthenticated {
+            await authVM.refreshProfile()
+            
+            // Если пользователь все еще аутентифицирован, загружаем избранное
+            if authVM.user != nil {
+                await favVM.loadFavorites()
+            }
         }
     }
 }

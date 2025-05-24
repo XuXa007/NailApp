@@ -13,6 +13,7 @@ extension UIImage {
             let cgColors = colors.map { $0.cgColor } as CFArray
             
             if let gradient = CGGradient(colorsSpace: colorSpace, colors: cgColors, locations: colorLocations) {
+                
                 // Рисуем линейный градиент
                 let startPoint = CGPoint(x: 0, y: 0)
                 let endPoint = CGPoint(x: size.width, y: 0)
