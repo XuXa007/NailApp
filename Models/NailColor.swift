@@ -38,23 +38,3 @@ enum NailColor: String, CaseIterable, Identifiable, CustomStringConvertible {
     }
 }
 
-
-//extension NailColor {
-//    var color: Color {
-//        switch self {
-//        case .red:    return .red
-//        case .pink:   return .pink
-//        case .blue:   return .blue
-//        case .green:  return .green
-//        case .purple: return .purple
-//            
-//            // case .black:  return .black
-//            // case .white:  return .white
-//            // case .yellow: return .yellow
-//            // case .orange: return .orange
-//            // case .brown:  return .brown
-//        case .gray:   return .gray
-//        @unknown default: return .gray
-//        }
-//    }
-//}
