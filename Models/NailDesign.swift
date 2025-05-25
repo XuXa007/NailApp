@@ -30,7 +30,7 @@ struct NailDesign: Identifiable, Codable {
     
     var imageURL: URL? {
         if imagePath.hasPrefix("http") {
-            let updatedPath = imagePath.replacingOccurrences(of: "192.168.1.5", with: "172.20.10.7")
+            let updatedPath = imagePath.replacingOccurrences(of: "192.168.1.5", with: "192.168.1.8")
             return URL(string: updatedPath)
         }
         

@@ -207,8 +207,7 @@ struct AddDesignView: View {
             occasion: selectedSeason.rawValue,
             length: selectedLength.rawValue,
             material: selectedMaterial.rawValue,
-            image: image,
-            username: username
+            image: image
         )
         
         if success {

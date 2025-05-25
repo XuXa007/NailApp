@@ -110,15 +110,13 @@ struct MasterDashboardView: View {
             }
         }
         .task {
-            if !hasLoaded, let username = authVM.user?.username {
+            if !hasLoaded {
                 hasLoaded = true
-                await viewModel.loadDesigns(username: username)
+                await viewModel.loadDesigns()
             }
         }
         .refreshable {
-            if let username = authVM.user?.username {
-                await viewModel.loadDesigns(username: username)
-            }
+            await viewModel.loadDesigns()
         }
         .alert("Ошибка", isPresented: $showErrorAlert) {
             Button("OK") {
