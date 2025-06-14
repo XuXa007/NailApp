@@ -16,14 +16,12 @@ struct NailAppApp: App {
                     setupViewModels()
                 }
                 .task {
-                    // Проверяем токен при запуске приложения
                     await refreshUserProfile()
                 }
         }
     }
     
     private func setupViewModels() {
-        // Связываем ViewModels
         favVM.setAuthViewModel(authVM)
         authVM.setFavoritesViewModel(favVM)
         
@@ -34,7 +32,6 @@ struct NailAppApp: App {
         if AuthService.shared.isAuthenticated {
             await authVM.refreshProfile()
             
-            // Если пользователь все еще аутентифицирован, загружаем избранное
             if authVM.user != nil {
                 await favVM.loadFavorites()
             }

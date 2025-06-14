@@ -26,7 +26,6 @@ struct ProfileView: View {
                 .padding(.top, 16)
                 
                 if let user = authVM.user {
-                    // Logged in user profile
                     VStack(spacing: 16) {
                         Image(systemName: user.role == .master ? "scissors" : "person.crop.circle.fill")
                             .resizable()
@@ -69,13 +68,11 @@ struct ProfileView: View {
                     }
                     .padding(.bottom, 8)
                     
-                    // Favorites section
                     FavoritesSectionView()
                         .environmentObject(favVM)
                     
                     Spacer()
                     
-                    // Logout button
                     Button {
                         authVM.logout()
                     } label: {
@@ -88,7 +85,6 @@ struct ProfileView: View {
                     }
                     .padding(.bottom, 32)
                 } else {
-                    // Not logged in
                     VStack(spacing: 24) {
                         Image(systemName: "person.crop.circle.badge.exclamationmark")
                             .resizable()

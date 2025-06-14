@@ -96,7 +96,6 @@ struct RegisterView: View {
                         }
                         .padding(.horizontal)
                         
-                        // Validation messages
                         VStack(alignment: .leading, spacing: 4) {
                             if !password.isEmpty && password.count < 6 {
                                 Text("Пароль должен содержать минимум 6 символов")

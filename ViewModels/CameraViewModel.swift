@@ -44,26 +44,19 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     }
     
     func setupSession() {
-        // Важное исправление: выполняем настройку в главном потоке
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            
             guard !self.isConfigured else { return }
-            
-            // Очищаем текущую сессию
             self.session.beginConfiguration()
             
             for input in self.session.inputs {
                 self.session.removeInput(input)
             }
-            
             for output in self.session.outputs {
                 self.session.removeOutput(output)
             }
             
-            // Установка высокого разрешения для качественного изображения
             self.session.sessionPreset = .high
-            
             guard let camera = self.getBestCamera() else {
                 self.setError("Не удалось инициализировать камеру")
                 self.session.commitConfiguration()
@@ -73,7 +66,6 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             self.camera = camera
             
             do {
-                // Настраиваем вход
                 let input = try AVCaptureDeviceInput(device: camera)
                 
                 if self.session.canAddInput(input) {
@@ -84,7 +76,6 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
                     return
                 }
                 
-                // Настраиваем выход
                 if self.session.canAddOutput(self.photoOutput) {
                     self.session.addOutput(self.photoOutput)
                 } else {
@@ -95,19 +86,15 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
                 
                 self.session.commitConfiguration()
                 self.isConfigured = true
+                print("камера настроена и готова к запуску")
                 
-                // Отладочное сообщение
-                print("Сессия камеры настроена и готова к запуску")
-                
-                // Запускаем сессию асинхронно
                 self.captureQueue.async {
                     if !self.session.isRunning {
                         self.session.startRunning()
-                        print("Сессия камеры запущена")
+                        print("камера запущена")
                     }
                 }
                 
-                // Запускаем таймер для измерения освещенности
                 self.startLightnessTimer()
             } catch {
                 self.setError("Ошибка настройки камеры: \(error.localizedDescription)")
@@ -128,13 +115,11 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             DispatchQueue.main.async {
                 self.lightnessTimer?.invalidate()
                 self.lightnessTimer = nil
-                // Сбрасываем флаг сконфигурированной сессии для возможности повторной настройки
                 self.isConfigured = false
             }
         }
     }
     
-    // ИСПРАВЛЕННЫЙ МЕТОД: теперь принимает замыкание вместо координатора
     func capturePhoto(completion: @escaping (UIImage?) -> Void) {
         guard session.isRunning else {
             completion(nil)
@@ -145,22 +130,18 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             statusMessage = "Недостаточное освещение для хорошего фото"
             statusIsWarning = true
             
-            // Даем обратную связь через вибрацию
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.warning)
             
-            // Продолжаем с захватом фото несмотря на предупреждение
         } else {
             statusMessage = "Захват фото..."
             statusIsWarning = false
         }
         
-        // Сохраняем замыкание для использования в делегате
         self.photoCompletion = completion
         
         let settings = AVCapturePhotoSettings()
         
-        // Оптимизируем настройки для рук
         settings.flashMode = .auto
         
         if let previewPhotoPixelFormatType = settings.availablePreviewPhotoPixelFormatTypes.first {
@@ -171,7 +152,6 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         photoOutput.capturePhoto(with: settings, delegate: self)
     }
     
-    // Метод делегата AVCapturePhotoCaptureDelegate для обработки захваченного фото
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         if let error = error {
             setError("Ошибка при захвате фото: \(error.localizedDescription)")
@@ -191,11 +171,9 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             return
         }
         
-        // Проверяем ориентацию и корректируем при необходимости
         var finalImage = image
         
-        // Уменьшаем изображение до оптимального размера для ML
-        finalImage = resizeImage(image: finalImage, maxDimension: 1200) // Использовать фиксированное значение, если Config недоступен
+        finalImage = resizeImage(image: finalImage, maxDimension: 1200)
         
         DispatchQueue.main.async { [weak self] in
             self?.statusMessage = nil
@@ -205,8 +183,6 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     
     func switchCamera() {
         stopSession()
-        
-        // Ждем остановки сессии
         captureQueue.async { [weak self] in
             guard let self = self else { return }
             
@@ -219,21 +195,17 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
     }
     
     private func getBestCamera() -> AVCaptureDevice? {
-        // Проверяем доступность задней камеры
         if let backCamera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) {
             do {
                 try backCamera.lockForConfiguration()
-                // Настраиваем автофокус для руки (обычно на расстоянии 20-40 см)
                 if backCamera.isFocusModeSupported(.continuousAutoFocus) {
                     backCamera.focusMode = .continuousAutoFocus
                 }
                 
-                // Включаем автоматическую настройку экспозиции
                 if backCamera.isExposureModeSupported(.continuousAutoExposure) {
                     backCamera.exposureMode = .continuousAutoExposure
                 }
                 
-                // Включаем автоматический баланс белого
                 if backCamera.isWhiteBalanceModeSupported(.continuousAutoWhiteBalance) {
                     backCamera.whiteBalanceMode = .continuousAutoWhiteBalance
                 }
@@ -247,7 +219,6 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             print("Задняя камера недоступна")
         }
         
-        // Если задняя недоступна, используем переднюю
         if let frontCamera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front) {
             print("Используем переднюю камеру")
             return frontCamera
@@ -270,14 +241,11 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         do {
             try camera.lockForConfiguration()
             
-            // ISO и выдержка помогают оценить освещенность
             let currentISO = camera.iso
             let currentExposureDuration = camera.exposureDuration
             
             let maxISO = camera.activeFormat.maxISO
             
-            // Если ISO близко к максимальному, вероятно, недостаточно света
-            // Если выдержка длинная, также недостаточно света
             let normalizedISO = min(currentISO / maxISO, 1.0)
             let exposureFactor = 1.0 - min(currentExposureDuration.seconds / 0.25, 1.0)
             
@@ -288,10 +256,8 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 
-                // Сглаживаем изменения, чтобы избежать резких скачков
                 self.lightLevel = self.lightLevel * 0.7 + calculatedLightLevel * 0.3
                 
-                // Обновляем сообщение в зависимости от уровня освещения
                 if self.lightLevel < 0.3 {
                     self.statusMessage = "Слишком темно. Найдите более яркое освещение."
                     self.statusIsWarning = true
@@ -320,16 +286,13 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         }
     }
     
-    // Метод для изменения размера изображения
     func resizeImage(image: UIImage, maxDimension: CGFloat) -> UIImage {
         let size = image.size
         
-        // Если изображение уже меньше максимального размера, вернуть его как есть
         if size.width <= maxDimension && size.height <= maxDimension {
             return image
         }
         
-        // Вычисляем новые размеры, сохраняя соотношение сторон
         var newWidth: CGFloat
         var newHeight: CGFloat
         
@@ -343,7 +306,6 @@ class CameraViewModel: NSObject, ObservableObject, AVCapturePhotoCaptureDelegate
         
         let targetSize = CGSize(width: newWidth, height: newHeight)
         
-        // Изменяем размер изображения
         UIGraphicsBeginImageContextWithOptions(targetSize, false, 1.0)
         image.draw(in: CGRect(origin: .zero, size: targetSize))
         let resizedImage = UIGraphicsGetImageFromCurrentImageContext()

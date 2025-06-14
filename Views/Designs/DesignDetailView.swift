@@ -127,7 +127,6 @@ struct DesignDetailView: View {
         .padding(.horizontal)
     }
 
-    // Обновленный метод для локализации значений
     private func localizedValue(_ value: String) -> String {
         let lowercased = value.lowercased()
         

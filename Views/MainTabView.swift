@@ -7,7 +7,6 @@ struct MainTabView: View {
     
     var body: some View {
         TabView {
-            // Catalog (available for everyone)
             NavigationStack {
                 DesignsView()
             }
@@ -22,7 +21,6 @@ struct MainTabView: View {
                 Label("Избранное", systemImage: "heart.fill")
             }
             
-            // Master dashboard (only for masters)
             if let user = authVM.user, user.role == .master {
                 NavigationStack {
                     MasterDashboardView()
@@ -32,7 +30,6 @@ struct MainTabView: View {
                 }
             }
             
-            // Profile (available for everyone)
             NavigationStack {
                 ProfileView()
             }

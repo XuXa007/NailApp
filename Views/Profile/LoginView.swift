@@ -19,7 +19,6 @@ struct LoginView: View {
                 VStack(spacing: 24) {
                     Spacer().frame(height: 40)
                     
-                    // Logo and app name
                     Image(systemName: "hand.raised.fill")
                         .resizable()
                         .scaledToFit()
@@ -54,7 +53,6 @@ struct LoginView: View {
                             }
                     }
                     
-                    // Login form
                     VStack(spacing: 16) {
                         TextField("Имя пользователя", text: $username)
                             .textContentType(.username)
@@ -67,7 +65,6 @@ struct LoginView: View {
                     }
                     .padding(.horizontal)
                     
-                    // Login button
                     Button("Войти") {
                         Task {
                             await authVM.login(username: username, password: password)
@@ -81,7 +78,6 @@ struct LoginView: View {
                     .disabled(authVM.isLoading || username.isEmpty || password.isEmpty)
                     .opacity((authVM.isLoading || username.isEmpty || password.isEmpty) ? 0.5 : 1.0)
                     
-                    // Register link
                     HStack {
                         Text("Нет аккаунта?")
                             .foregroundColor(.white.opacity(0.8))
@@ -94,7 +90,6 @@ struct LoginView: View {
                     
                     Spacer()
                     
-                    // Demo login options (для разработки)
                     if Config.baseURL.contains("192.168") || Config.baseURL.contains("localhost") {
                         VStack(spacing: 16) {
                             Text("Быстрый вход для демонстрации")

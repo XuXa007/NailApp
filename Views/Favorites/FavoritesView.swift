@@ -8,7 +8,6 @@ struct FavoritesView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                // Background gradient
                 LinearGradient(
                     gradient: Gradient(colors: [Color.purple.opacity(0.3), Color.blue.opacity(0.3)]),
                     startPoint: .topLeading,
@@ -23,16 +22,13 @@ struct FavoritesView: View {
                         .padding(.top, 16)
                     
                     if authVM.user == nil {
-                        // User not logged in
                         notLoggedInView
                     } else if favVM.isLoading {
-                        // Loading state
                         ProgressView()
                             .scaleEffect(1.5)
                             .tint(.white)
                             .padding()
                     } else if favVM.items.isEmpty {
-                        // Empty state
                         VStack(spacing: 16) {
                             Image(systemName: "heart")
                                 .font(.system(size: 60))
@@ -52,7 +48,6 @@ struct FavoritesView: View {
                         }
                         .padding()
                     } else {
-                        // Favorites list
                         ScrollView {
                             LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 16)], spacing: 16) {
                                 ForEach(favVM.items) { design in
@@ -73,11 +68,9 @@ struct FavoritesView: View {
             .onAppear {
                 if !hasAppeared {
                     hasAppeared = true
-                    // Связываем ViewModels при первом появлении экрана
                     favVM.setAuthViewModel(authVM)
                     authVM.setFavoritesViewModel(favVM)
                     
-                    // Загружаем избранное только если пользователь залогинен
                     if authVM.user != nil {
                         Task {
                             await favVM.loadFavorites()
@@ -97,7 +90,6 @@ struct FavoritesView: View {
         }
     }
     
-    // View for when user is not logged in
     private var notLoggedInView: some View {
         VStack(spacing: 20) {
             Image(systemName: "heart.slash")

@@ -114,7 +114,6 @@ class AuthService {
                 throw AuthError.invalidCredentials
                 
             case 400...499:
-                // Пытаемся получить сообщение об ошибке от сервера
                 if let errorData = try? JSONDecoder().decode([String: String].self, from: data),
                    let message = errorData["message"] {
                     throw NSError(domain: "AuthError", code: httpResponse.statusCode,
@@ -337,7 +336,6 @@ class AuthService {
     
     
     private func isTokenExpired() -> Bool {
-        // Простая проверка - можно улучшить декодированием JWT
         guard let token = currentToken else { return true }
         
         return false

@@ -1,13 +1,14 @@
 import SwiftUI
 
 enum NailColor: String, CaseIterable, Identifiable, CustomStringConvertible {
-    case pink, purple, red, blue, green, gray, burgundy, fuchsia, nude, mint, olive
+    case pink,orange, purple, red, blue, green, gray, burgundy, fuchsia, nude, mint, olive
 
     var id: String { rawValue }
 
     var description: String {
         switch self {
         case .pink: return "Розовый"
+        case .orange: return "Оранжевый"
         case .purple: return "Фиолетовый"
         case .red: return "Красный"
         case .blue: return "Синий"
@@ -24,6 +25,7 @@ enum NailColor: String, CaseIterable, Identifiable, CustomStringConvertible {
     var color: Color {
         switch self {
         case .red:      return .red
+        case .orange:   return .orange
         case .pink:     return .pink
         case .purple:   return .purple
         case .blue:     return .blue

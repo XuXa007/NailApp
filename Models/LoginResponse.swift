@@ -36,7 +36,6 @@ class AuthToken: ObservableObject {
     private func isTokenExpired() -> Bool {
         guard let token = token else { return true }
         
-        // Простая проверка токена (можно улучшить)
         let parts = token.components(separatedBy: ".")
         guard parts.count == 3 else { return true }
         

@@ -22,7 +22,6 @@ struct TryOnCameraView: View {
                     .foregroundColor(.white)
                     .padding(.top, 16)
                 
-                // Выбранный дизайн или кнопка выбора
                 if let design = selectedDesign {
                     VStack {
                         HStack {
@@ -101,7 +100,6 @@ struct TryOnCameraView: View {
                 
                 Spacer()
                 
-                // Инструкции и кнопка камеры
                 VStack(spacing: 20) {
                     Text("Сделайте фото ваших рук или загрузите готовое изображение, чтобы примерить выбранный дизайн.")
                         .font(.subheadline)
@@ -149,18 +147,15 @@ struct TryOnCameraView: View {
         }
         .sheet(isPresented: $showCamera) {
             if capturedImage != nil {
-                // Показываем результат примерки
                 if let design = selectedDesign {
                     ARTryOnView(design: design)
                 }
             } else {
-                // Показываем камеру
                 CameraView(capturedImage: $capturedImage)
             }
         }
         .onChange(of: capturedImage) { newImage in
             if newImage != nil {
-                // После получения изображения сразу переходим к примерке
                 showCamera = true
             }
         }

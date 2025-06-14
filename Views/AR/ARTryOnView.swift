@@ -6,11 +6,10 @@ class ARTryOnViewModel: NSObject, ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     
-    // Создаем экземпляр ARImageProcessor
+
     private var imageProcessor = ARImageProcessor()
     private var cancellables = Set<AnyCancellable>()
     
-    // Метод обработки изображения дизайна ногтей
     func tryOnDesign(handImage: UIImage, design: NailDesign,
                      threshold: Double = Config.TryOn.defaultThreshold,
                      opacity: Double = Config.TryOn.defaultOpacity) {
@@ -34,7 +33,6 @@ class ARTryOnViewModel: NSObject, ObservableObject {
             .store(in: &cancellables)
     }
     
-    // Метод для изменения размера изображения
     func resizeImage(_ image: UIImage, maxSize: CGFloat) -> UIImage {
         let aspectRatio = image.size.width / image.size.height
         
@@ -53,7 +51,6 @@ class ARTryOnViewModel: NSObject, ObservableObject {
         return compressedImage
     }
     
-    // Обработка ошибок
     private func handleError(_ error: Error) {
         if let urlError = error as? URLError {
             switch urlError.code {
@@ -77,7 +74,6 @@ class ARTryOnViewModel: NSObject, ObservableObject {
 }
 
 struct ARTryOnView: View {
-    // Дизайн передается при создании компонента
     let design: NailDesign
     
     @StateObject private var vm = ARTryOnViewModel()
@@ -87,7 +83,6 @@ struct ARTryOnView: View {
     
     var body: some View {
         ZStack {
-            // Градиентный фон
             LinearGradient(
                 gradient: Gradient(colors: [Color.purple.opacity(0.3), Color.blue.opacity(0.3)]),
                 startPoint: .topLeading,
@@ -96,13 +91,11 @@ struct ARTryOnView: View {
             .ignoresSafeArea()
             
             VStack(spacing: 20) {
-                // Заголовок
                 Text("Виртуальная примерка")
                     .font(.largeTitle).bold()
                     .foregroundColor(.white)
                     .padding(.top, 16)
                 
-                // Информация о выбранном дизайне
                 VStack {
                     HStack {
                         Text("Выбранный дизайн")
@@ -165,7 +158,6 @@ struct ARTryOnView: View {
                         .cornerRadius(12)
                         .padding(.horizontal)
                     } else if let resultImage = vm.resultImage {
-                        // Показываем результат
                         ZStack {
                             Image(uiImage: resultImage)
                                 .resizable()
@@ -262,12 +254,10 @@ struct ARTryOnView: View {
                 
                 if let _ = inputImage, let _ = design.imageURL, vm.resultImage == nil {
                     Button {
-                        // Показать спиннер перед обработкой
                         withAnimation {
                             vm.isLoading = true
                         }
                         
-                        // Добавим таймер на 1 секунду для отображения спиннера
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                             vm.tryOnDesign(handImage: inputImage!, design: design)
                         }

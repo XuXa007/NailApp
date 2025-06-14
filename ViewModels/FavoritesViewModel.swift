@@ -6,21 +6,13 @@ final class FavoritesViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
     
-    // Кэш избранных для оптимизации
     private var favoriteIds: Set<String> = []
-    
-    // Ссылка на основной AuthViewModel
     private weak var authViewModel: AuthViewModel?
-    
-    // Защита от повторных запросов
     private var loadingTask: Task<Void, Never>?
-    
-    // Метод для установки ссылки на AuthViewModel
     func setAuthViewModel(_ authVM: AuthViewModel) {
         self.authViewModel = authVM
     }
     
-    // Загрузка избранного с сервера
     func loadFavorites() async {
         guard AuthService.shared.isAuthenticated else {
             print("Пользователь не аутентифицирован")
@@ -44,7 +36,6 @@ final class FavoritesViewModel: ObservableObject {
             do {
                 let favorites = try await ApiService.shared.fetchFavorites()
                 
-                // Проверяем, не отменили ли задачу
                 if Task.isCancelled {
                     print("Задача загрузки избранного отменена")
                     return
@@ -69,7 +60,6 @@ final class FavoritesViewModel: ObservableObject {
                 print("Ошибка загрузки избранного:", error)
                 await MainActor.run {
                     errorMessage = error.localizedDescription
-                    // Не очищаем список при ошибке, оставляем кэш
                 }
             }
             
@@ -81,7 +71,6 @@ final class FavoritesViewModel: ObservableObject {
         await loadingTask?.value
     }
     
-    // Добавление/удаление из избранного
     func toggle(_ design: NailDesign) {
         guard AuthService.shared.isAuthenticated else {
             print("Пользователь не аутентифицирован для toggle")
@@ -90,10 +79,8 @@ final class FavoritesViewModel: ObservableObject {
         }
         
         print("Переключаем избранное для дизайна \(design.id)")
-        
         let wasInFavorites = favoriteIds.contains(design.id)
         
-        // Оптимистичное обновление UI
         if wasInFavorites {
             favoriteIds.remove(design.id)
             items.removeAll { $0.id == design.id }
@@ -104,7 +91,6 @@ final class FavoritesViewModel: ObservableObject {
             }
         }
         
-        // Отправляем запрос на сервер
         Task {
             do {
                 if wasInFavorites {
@@ -121,7 +107,6 @@ final class FavoritesViewModel: ObservableObject {
                 }
             } catch {
                 print("Ошибка при обновлении избранного:", error)
-                // Откатываем изменения при ошибке
                 await MainActor.run {
                     if wasInFavorites {
                         favoriteIds.insert(design.id)
@@ -138,13 +123,11 @@ final class FavoritesViewModel: ObservableObject {
         }
     }
     
-    // Проверка, находится ли дизайн в избранном
     func isFavorite(_ design: NailDesign) -> Bool {
         guard AuthService.shared.isAuthenticated else { return false }
         return favoriteIds.contains(design.id)
     }
     
-    // Очистка избранного при выходе из аккаунта
     func clearFavorites() {
         loadingTask?.cancel()
         loadingTask = nil

@@ -15,7 +15,6 @@ struct CameraView: View {
             )
             .ignoresSafeArea()
             
-            // Основное содержимое
             VStack {
                 Text("Фото руки")
                     .font(.title)
@@ -23,7 +22,6 @@ struct CameraView: View {
                     .foregroundColor(.white)
                     .padding(.top, 16)
                 
-                // Увеличиваем размер предпросмотра камеры
                 ZStack {
                     CameraPreviewView(session: viewModel.session)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -34,12 +32,10 @@ struct CameraView: View {
                         )
                         .padding(.horizontal, 20)
                     
-                    // Добавляем контур руки
                     HandImageOverlayView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .padding(.horizontal, 20)
                     
-                    // Индикатор освещения
                     VStack {
                         Spacer()
                         LightLevelIndicator(lightLevel: viewModel.lightLevel)
@@ -48,7 +44,6 @@ struct CameraView: View {
                 }
                 .frame(maxHeight: .infinity)
                 
-                // Уведомления и подсказки
                 if let message = viewModel.statusMessage {
                     Text(message)
                         .font(.subheadline)
@@ -60,7 +55,6 @@ struct CameraView: View {
                         .padding(.vertical, 8)
                 }
                 
-                // Кнопки управления
                 HStack(spacing: 50) {
                     Button(action: {
                         presentationMode.wrappedValue.dismiss()
@@ -71,7 +65,6 @@ struct CameraView: View {
                     }
                     
                     Button(action: {
-                        // Обновленный вызов без координатора
                         viewModel.capturePhoto { image in
                             if let image = image {
                                 self.capturedImage = image
@@ -101,7 +94,6 @@ struct CameraView: View {
             }
         }
         .onAppear {
-            // Важное исправление: принудительно перезапускаем сессию камеры при появлении экрана
             viewModel.stopSession()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 viewModel.checkPermissionsAndStartSession()
@@ -113,38 +105,7 @@ struct CameraView: View {
     }
 }
 
-// Представление предпросмотра камеры
-//struct CameraPreviewView: UIViewRepresentable {
-//    let session: AVCaptureSession
-//    
-//    func makeUIView(context: Context) -> UIView {
-//        let view = PreviewView()
-//        view.backgroundColor = .black
-//        view.videoPreviewLayer.session = session
-//        view.videoPreviewLayer.videoGravity = .resizeAspectFill
-//        
-//        return view
-//    }
-//    
-//    func updateUIView(_ uiView: UIView, context: Context) {
-//        if let previewView = uiView as? PreviewView {
-//            previewView.videoPreviewLayer.frame = uiView.bounds
-//        }
-//    }
-//    
-//    // Класс для правильного создания слоя превью
-//    class PreviewView: UIView {
-//        override class var layerClass: AnyClass {
-//            return AVCaptureVideoPreviewLayer.self
-//        }
-//        
-//        var videoPreviewLayer: AVCaptureVideoPreviewLayer {
-//            return layer as! AVCaptureVideoPreviewLayer
-//        }
-//    }
-//}
 
-// Индикатор уровня освещения
 struct LightLevelIndicator: View {
     let lightLevel: Double
     
@@ -154,7 +115,6 @@ struct LightLevelIndicator: View {
                 .foregroundColor(lightColor)
                 .font(.system(size: 14))
             
-            // Прогресс-бар освещенности
             ZStack(alignment: .leading) {
                 RoundedRectangle(cornerRadius: 2)
                     .fill(Color.white.opacity(0.3))

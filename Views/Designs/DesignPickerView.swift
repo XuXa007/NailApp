@@ -105,7 +105,6 @@ struct DesignPickerView: View {
                 )
             }
             .onAppear {
-                // Загружаем дизайны, если еще не загружены
                 if designsVM.allDesigns.isEmpty {
                     Task {
                         await designsVM.loadDesigns()

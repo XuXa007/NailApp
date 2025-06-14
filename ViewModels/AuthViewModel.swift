@@ -6,11 +6,9 @@ class AuthViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
     
-    // Ссылка на FavoritesViewModel для очистки избранного
     private weak var favoritesViewModel: FavoritesViewModel?
     
     init() {
-        // Проверяем, есть ли сохраненный пользователь при запуске
         if AuthService.shared.isAuthenticated {
             user = AuthService.shared.currentUser
         }
@@ -123,7 +121,6 @@ class AuthViewModel: ObservableObject {
     }
         
     func loginAsClient() {
-        // Создаем демо-пользователя для тестирования UI
         user = UserProfile(
             id: "demo-client",
             username: "demo_client",

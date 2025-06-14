@@ -4,8 +4,9 @@ import UIKit
 struct Config {
     static var baseURL: String {
         #if DEBUG
-        // Для разработки используем UserDefaults с fallback на ваш IP
-        return UserDefaults.standard.string(forKey: "server_url") ?? "http://192.168.1.8:8080"
+        // 192.168.1.8:8080
+        // 172.20.10.1:8080
+        return UserDefaults.standard.string(forKey: "server_url") ?? "http://172.20.10.7:8080"
         #else
         return "https://api.yournaildomain.com"
         #endif

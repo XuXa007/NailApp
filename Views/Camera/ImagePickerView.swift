@@ -10,10 +10,8 @@ struct ImagePickerView: View {
     var body: some View {
         Group {
             if useCamera {
-                // Используем нашу упрощенную камеру
                 CameraView(capturedImage: $image)
             } else {
-                // Используем стандартный пикер для галереи
                 StandardImagePicker(image: $image, sourceType: sourceType)
             }
         }
@@ -23,7 +21,6 @@ struct ImagePickerView: View {
                     Spacer()
                     
                     Button {
-                        // Переключаемся между камерой и галереей
                         useCamera.toggle()
                         if !useCamera {
                             sourceType = .photoLibrary
@@ -44,7 +41,6 @@ struct ImagePickerView: View {
     }
 }
 
-// Стандартный пикер изображений для галереи
 struct StandardImagePicker: UIViewControllerRepresentable {
     @Binding var image: UIImage?
     @Environment(\.dismiss) var dismiss
@@ -72,7 +68,6 @@ struct StandardImagePicker: UIViewControllerRepresentable {
         
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             if let selectedImage = info[.originalImage] as? UIImage {
-                // Обработка изображения (приведение к нужному размеру)
                 let processedImage = processImageForML(selectedImage)
                 parent.image = processedImage
             }
@@ -84,16 +79,13 @@ struct StandardImagePicker: UIViewControllerRepresentable {
         }
         
         private func processImageForML(_ image: UIImage) -> UIImage {
-            // Приводим изображение к оптимальному размеру для ML
-            let maxDimension: CGFloat = 1200 // Используем зафиксированное значение вместо Config
+            let maxDimension: CGFloat = 1200
             let size = image.size
             
-            // Если изображение уже подходящего размера
             if size.width <= maxDimension && size.height <= maxDimension {
                 return image
             }
             
-            // Изменяем размер, сохраняя пропорции
             var newWidth: CGFloat
             var newHeight: CGFloat
             

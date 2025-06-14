@@ -33,7 +33,6 @@ class ARImageProcessor {
         var req = URLRequest(url: finalUrl)
         req.httpMethod = "POST"
         
-        // Оптимизировать размер изображения перед отправкой
         let resizedImage = resizeImageIfNeeded(base, maxDimension: Config.TryOn.maxImageDimension)
         guard let baseData = resizedImage.jpegData(compressionQuality: 0.85) else {
             print("Ошибка: не удалось преобразовать изображение руки в JPEG")
@@ -53,8 +52,7 @@ class ARImageProcessor {
             ]
         )
         
-        // Увеличиваем таймаут запроса
-        req.timeoutInterval = 60.0 // 60 секунд
+        req.timeoutInterval = 60.0
         
         print("Отправка запроса на сервер...")
         
@@ -86,16 +84,13 @@ class ARImageProcessor {
             .eraseToAnyPublisher()
     }
     
-    // Метод для изменения размера изображения
     private func resizeImageIfNeeded(_ image: UIImage, maxDimension: CGFloat = 1200) -> UIImage {
         let size = image.size
         
-        // Если изображение уже меньше максимального размера, вернуть его как есть
         if size.width <= maxDimension && size.height <= maxDimension {
             return image
         }
         
-        // Вычисляем новые размеры, сохраняя соотношение сторон
         var newWidth: CGFloat
         var newHeight: CGFloat
         
@@ -109,7 +104,6 @@ class ARImageProcessor {
         
         let targetSize = CGSize(width: newWidth, height: newHeight)
         
-        // Изменяем размер изображения
         UIGraphicsBeginImageContextWithOptions(targetSize, false, 1.0)
         image.draw(in: CGRect(origin: .zero, size: targetSize))
         let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
@@ -129,7 +123,7 @@ class ARImageProcessor {
             
             var partData = part.data
             if part.filename.hasSuffix(".jpg") || part.filename.hasSuffix(".jpeg") {
-                if partData.count > 1_000_000 { // 1MB
+                if partData.count > 1_000_000 {
                     if let image = UIImage(data: partData),
                        let compressedData = image.jpegData(compressionQuality: 0.7) {
                         partData = compressedData

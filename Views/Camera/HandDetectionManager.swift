@@ -2,7 +2,6 @@ import UIKit
 import AVFoundation
 import Vision
 
-// Менеджер детекции руки и ногтей
 class HandDetectionManager {
     typealias DetectionCallback = (Bool, CGRect?, Double) -> Void
     
@@ -12,7 +11,6 @@ class HandDetectionManager {
     private var lastProcessingTime = Date()
     private var detectionCallback: DetectionCallback?
     
-    // Инициализация с моделью CoreML (если доступна)
     init() {
         setupVisionModel()
     }
@@ -20,11 +18,9 @@ class HandDetectionManager {
     private func setupVisionModel() {
     }
     
-    // Запуск процесса детекции
     func detectHand(in pixelBuffer: CVPixelBuffer, callback: @escaping DetectionCallback) {
         detectionCallback = callback
         
-        // Проверка на слишком частые вызовы
         let now = Date()
         if isProcessing || now.timeIntervalSince(lastProcessingTime) < Config.TryOn.Detection.handDetectionInterval {
             return
@@ -49,10 +45,8 @@ class HandDetectionManager {
         }
     }
     
-    // Упрощенный метод анализа изображения
     private func analyzeImageForHand(_ image: CGImage, completion: @escaping (Bool, CGRect?, Double) -> Void) {
         
-        // Создаем изображение меньшего размера для более быстрого анализа
         let size = CGSize(width: 200, height: 200 * CGFloat(image.height) / CGFloat(image.width))
         UIGraphicsBeginImageContextWithOptions(size, true, 1.0)
         let context = UIGraphicsGetCurrentContext()!
@@ -60,14 +54,12 @@ class HandDetectionManager {
         let resizedImage = UIGraphicsGetImageFromCurrentImageContext()!
         UIGraphicsEndImageContext()
         
-        // Анализируем пиксели на наличие цвета кожи
         if let pixelData = resizedImage.cgImage?.dataProvider?.data {
             let data: UnsafePointer<UInt8> = CFDataGetBytePtr(pixelData)
             let bytesPerRow = resizedImage.cgImage!.bytesPerRow
             let width = resizedImage.cgImage!.width
             let height = resizedImage.cgImage!.height
             
-            // Простой алгоритм для демонстрации - проверка центральной области
             var skinColorPixelsCount = 0
             let centerX = width / 2
             let centerY = height / 2
@@ -85,7 +77,6 @@ class HandDetectionManager {
                     let green = Double(data[offset + 1])
                     let blue = Double(data[offset + 2])
                     
-                    // Упрощенные критерии цвета кожи
                     if isSkinColorPixel(r: red, g: green, b: blue) {
                         skinColorPixelsCount += 1
                     }
@@ -95,11 +86,10 @@ class HandDetectionManager {
             let totalPixels = (endX - startX) * (endY - startY)
             let skinPercentage = Double(skinColorPixelsCount) / Double(totalPixels)
             
-            let handDetected = skinPercentage > 0.15 // 15% пикселей с цветом кожи
+            let handDetected = skinPercentage > 0.15
             let handRect = handDetected ? CGRect(x: startX, y: startY, width: endX - startX, height: endY - startY) : nil
-            let confidence = min(skinPercentage * 2.0, 1.0) // Упрощенная оценка уверенности
+            let confidence = min(skinPercentage * 2.0, 1.0)
             
-            // Иммитируем обработку
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 completion(handDetected, handRect, confidence)
             }
@@ -108,9 +98,7 @@ class HandDetectionManager {
         }
     }
     
-    // Простая проверка, похож ли пиксель на цвет кожи
     private func isSkinColorPixel(r: Double, g: Double, b: Double) -> Bool {
-        // Нормализуем значения
         let sum = r + g + b
         guard sum > 0 else { return false }
         
@@ -118,18 +106,14 @@ class HandDetectionManager {
         let normalizedG = g / sum
         let normalizedB = b / sum
         
-        // Простое правило для определения цвета кожи
         return normalizedR > 0.35 && normalizedG > 0.2 && normalizedG < 0.35 && normalizedB < 0.3
     }
 }
 
-// Расширение для оценки освещения
 extension CameraViewModel {
-    // Метод для анализа освещения на изображении
     func analyzeLighting(in image: UIImage) -> Double {
         guard let cgImage = image.cgImage else { return 0.5 }
         
-        // Уменьшаем изображение для более быстрого анализа
         let width = 100
         let height = 100
         let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
@@ -154,17 +138,14 @@ extension CameraViewModel {
                 let g = Double(data[offset + 1])
                 let b = Double(data[offset + 2])
                 
-                // Вычисляем яркость пикселя (средневзвешенное значение RGB)
                 let brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255.0
                 totalBrightness += brightness
                 pixelCount += 1
             }
         }
         
-        // Средняя яркость всего изображения
         let averageBrightness = pixelCount > 0 ? totalBrightness / pixelCount : 0.5
         
-        // Нормализуем в диапазон 0.0-1.0
         return averageBrightness
     }
 }

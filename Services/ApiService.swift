@@ -149,7 +149,7 @@ class ApiService {
             
             if http.statusCode == 401 {
                 try await AuthService.shared.refreshToken()
-                return try await fetchFavorites() // Повторяем запрос
+                return try await fetchFavorites() 
             }
             
             if !(200..<300).contains(http.statusCode) {
@@ -300,7 +300,6 @@ class ApiService {
         
         var body = Data()
         
-        // Добавляем текстовые поля
         let fields = [
             "name": name,
             "description": description,
@@ -317,7 +316,6 @@ class ApiService {
             body.append("\(value)\r\n")
         }
         
-        // Добавляем изображение
         body.append("--\(boundary)\r\n")
         body.append("Content-Disposition: form-data; name=\"image\"; filename=\"design.jpg\"\r\n")
         body.append("Content-Type: image/jpeg\r\n\r\n")

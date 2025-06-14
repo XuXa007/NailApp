@@ -1,17 +1,31 @@
-//
-//  NailAppTests.swift
-//  NailAppTests
-//
-//  Created by Ксюша Лягашкина on 09.05.2025.
-//
-
-import Testing
+import XCTest
+import Foundation
 @testable import NailApp
 
-struct NailAppTests {
+final class NailAppTests: XCTestCase {
 
-    @Test func example() async throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+    func testExample() async throws {
+        XCTAssertTrue(true)
     }
-
+    
+    func testAPIConnection() async throws {
+        let expectation = XCTestExpectation(description: "API responds")
+        
+        // GET запрос
+        let url = URL(string: "http://172.20.10.7:8080/api/designs")!
+        
+        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            XCTAssertNil(error, "Should not have error")
+            XCTAssertNotNil(data, "Should have data")
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                XCTAssertEqual(httpResponse.statusCode, 200, "Should return 200")
+            }
+            
+            expectation.fulfill()
+        }
+        
+        task.resume()
+        await fulfillment(of: [expectation], timeout: 10.0)
+    }
 }
